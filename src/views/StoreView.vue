@@ -4,6 +4,9 @@ import { useRoute } from 'vue-router';
 import { services } from "@/services/api";
 import ProductCard from "@/components/products/ProductCard.vue";
 import InfiniteProductList from "@/components/products/InfiniteProductList.vue";
+import { useCartStore } from "@/stores/cartStore";
+
+const cartStore = useCartStore();
 
 const route = useRoute();
 const loading = ref(true);
@@ -86,6 +89,14 @@ const fetchStoreInfo = async () => {
   try {
     const response = await services.getStore(route.params.slug);
     infoNegocio.value = response.data;
+    
+    // Inicializar el carrito para esta tienda
+    cartStore.setCurrentStore(route.params.slug, {
+      id: response.data.id,
+      nombre: response.data.nombre,
+      slug: route.params.slug
+    });
+    
   } catch (err) {
     error.value = "Error al cargar la información de la tienda";
     console.error(err);
