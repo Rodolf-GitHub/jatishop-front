@@ -2,7 +2,9 @@
 import { ref } from 'vue'
 import { PhoneIcon, MapPinIcon, ClipboardDocumentIcon, ClipboardDocumentCheckIcon } from '@heroicons/vue/24/outline'
 import IconWhatsApp from '@/components/icons/IconWhatsApp.vue'
+import { useCartStore } from '@/stores/cartStore'
 
+const cartStore = useCartStore()
 const props = defineProps({
   showModal: Boolean,
   infoNegocio: Object,
@@ -27,6 +29,13 @@ const generateOrderText = () => {
 };
 
 const generateWhatsAppMessage = () => encodeURIComponent(generateOrderText());
+
+const handleWhatsAppClick = () => {
+  setTimeout(() => {
+    cartStore.clearCart()
+    emit('close')
+  }, 1000)
+}
 
 const copyToClipboard = async () => {
   try {
@@ -71,6 +80,7 @@ const copyToClipboard = async () => {
             <a v-if="infoNegocio?.whatsapp"
                :href="`${infoNegocio.whatsapp}?text=${generateWhatsAppMessage()}`"
                target="_blank"
+               @click="handleWhatsAppClick"
                class="flex items-center gap-2 p-3 bg-green-500 text-white rounded-lg hover:bg-green-600">
               <IconWhatsApp class="h-5 w-5"/>
               <span>WhatsApp</span>
