@@ -151,36 +151,40 @@ onMounted(fetchData);
             <div
               v-if="categoria.subcategorias?.length"
               class="overflow-hidden transition-all duration-200"
-              :class="[isCategoryExpanded(categoria.id) ? 'max-h-96' : 'max-h-0']"
+              :class="[isCategoryExpanded(categoria.id) ? 'max-h-[300px]' : 'max-h-0']"
             >
               <div 
-                v-for="subcategoria in categoria.subcategorias"
-                :key="subcategoria.id"
-                class="pl-16 pr-4 py-2"
+                class="pl-16 pr-4 overflow-y-auto max-h-[300px] subcategorias-container"
               >
                 <div
-                  class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                  :class="{'bg-gray-50': route.params.subcategoriaId === String(subcategoria.id)}"
-                  @click="navigateToSubcategoria(categoria, subcategoria)"
+                  v-for="subcategoria in categoria.subcategorias"
+                  :key="subcategoria.id"
+                  class="py-2"
                 >
-                  <!-- Imagen de subcategoría -->
-                  <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
-                    <img
-                      v-if="subcategoria.imagen"
-                      :src="subcategoria.imagen"
-                      :alt="subcategoria.nombre"
-                      class="w-full h-full object-cover"
-                      @error="$event.target.src = '/placeholder-image.png'"
-                    />
-                    <div v-else class="w-full h-full bg-gradient-to-br from-shop to-shop/70" />
-                  </div>
-
-                  <span 
-                    class="text-shop font-medium truncate"
-                    :class="{'font-semibold': route.params.subcategoriaId === String(subcategoria.id)}"
+                  <div
+                    class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                    :class="{'bg-gray-50': route.params.subcategoriaId === String(subcategoria.id)}"
+                    @click="navigateToSubcategoria(categoria, subcategoria)"
                   >
-                    {{ subcategoria.nombre }}
-                  </span>
+                    <!-- Imagen de subcategoría -->
+                    <div class="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+                      <img
+                        v-if="subcategoria.imagen"
+                        :src="subcategoria.imagen"
+                        :alt="subcategoria.nombre"
+                        class="w-full h-full object-cover"
+                        @error="$event.target.src = '/placeholder-image.png'"
+                      />
+                      <div v-else class="w-full h-full bg-gradient-to-br from-shop to-shop/70" />
+                    </div>
+
+                    <span 
+                      class="text-shop font-medium truncate"
+                      :class="{'font-semibold': route.params.subcategoriaId === String(subcategoria.id)}"
+                    >
+                      {{ subcategoria.nombre }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -199,5 +203,23 @@ onMounted(fetchData);
 
 .to-shop {
   --tw-gradient-to: theme('colors.shop');
+}
+
+.subcategorias-container {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.shop') transparent;
+}
+
+.subcategorias-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.subcategorias-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.subcategorias-container::-webkit-scrollbar-thumb {
+  background-color: theme('colors.shop');
+  border-radius: 3px;
 }
 </style>
