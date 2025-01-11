@@ -59,12 +59,10 @@ const isCurrentRoute = (routeName) => {
           <template v-for="item in navigation" :key="item.name">
             <router-link
               :to="item.route"
-              class="px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              :class="[
-                isCurrentRoute(item.route.name)
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-100'
-              ]"
+              class="px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-600 hover:bg-gray-100"
+              :class="{
+                'bg-blue-200 text-blue-800': isCurrentRoute(item.route.name)
+              }"
             >
               <div class="flex items-center gap-2">
                 <component :is="item.icon" class="h-5 w-5" />
@@ -79,12 +77,10 @@ const isCurrentRoute = (routeName) => {
           <template v-for="item in navigation" :key="item.name">
             <router-link
               :to="item.route"
-              class="p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
-              :class="[
-                isCurrentRoute(item.route.name)
-                  ? 'text-blue-600'
-                  : 'text-gray-600'
-              ]"
+              class="p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md text-gray-600"
+              :class="{
+                'bg-blue-200 text-blue-800': isCurrentRoute(item.route.name)
+              }"
             >
               <component :is="item.icon" class="h-7 w-7 stroke-[2.5]" />
             </router-link>
@@ -99,7 +95,5 @@ const isCurrentRoute = (routeName) => {
 </template>
 
 <style scoped>
-.router-link-active {
-  @apply bg-blue-100 text-blue-600;
-}
+/* Eliminamos el estilo global de router-link-active para evitar que afecte a todos los enlaces */
 </style>
