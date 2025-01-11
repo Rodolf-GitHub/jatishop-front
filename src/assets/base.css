@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Las variables serán actualizadas dinámicamente */
+  --primary-100: #d4eaf7;
+  --primary-200: #b6ccd8;
+  --primary-300: #3b3c3d;
+  --accent-100: #71c4ef;
+  --accent-200: #00668c;
+  --accent-300: #004d6b;
+  --text-100: #1d1c1c;
+  --text-200: #313d44;
+  --text-light: #fffefb;
+  --text-dark: #00334d;
+  --bg-100: #fffefb;
+  --bg-200: #f5f4f1;
+  --bg-300: #cccbc8;
+}
+
+@layer components {
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r;
+    --tw-gradient-from: var(--accent-300);
+    --tw-gradient-to: var(--accent-200);
+  }
+}
+
+/* Estilos globales */
+body {
+  background-color: var(--bg-100);
+  color: var(--text-100);
+}
