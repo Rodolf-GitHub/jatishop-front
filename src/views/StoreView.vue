@@ -92,7 +92,6 @@ const fetchStoreInfo = async () => {
     
     // Inicializar el carrito para esta tienda
     cartStore.setCurrentStore(route.params.slug, {
-      id: response.data.id,
       nombre: response.data.nombre,
       slug: route.params.slug
     });

@@ -19,10 +19,41 @@ const error = ref(null);
 const currentPage = ref(1);
 const hasMore = ref(true);
 const searchQuery = ref('');
-const isSearching = ref(false);
-const totalItems = ref(0);
+const searchTimeout = ref(null);
 
-// Productos filtrados
+const fetchProductos = async (page = 1) => {
+  try {
+    if (page === 1) {
+      loading.value = true;
+      productos.value = [];
+    } else {
+      loadingMore.value = true;
+    }
+
+    const response = await services.getStoreProducts(props.storeSlug, page);
+    
+    if (response?.data?.results) {
+      if (page === 1) {
+        productos.value = response.data.results;
+        emit('products-loaded', response.data.results);
+      } else {
+        const newProducts = response.data.results;
+        productos.value = [...productos.value, ...newProducts];
+      }
+      
+      hasMore.value = !!response.data.next;
+      currentPage.value = page;
+    }
+  } catch (err) {
+    console.log('Error fetching store products:', err);
+    error.value = err;
+    emit('error', err);
+  } finally {
+    loading.value = false;
+    loadingMore.value = false;
+  }
+};
+
 const filteredProducts = computed(() => {
   if (!searchQuery.value) return productos.value;
   
@@ -33,86 +64,38 @@ const filteredProducts = computed(() => {
   );
 });
 
-const handleSearch = (event) => {
-  searchQuery.value = event.target.value;
-  isSearching.value = !!searchQuery.value;
-  // Resetear la paginación cuando se busca
-  if (isSearching.value) {
-    hasMore.value = false;
-  } else {
-    hasMore.value = true;
-    currentPage.value = 1;
-    fetchProductos();
+const handleSearch = () => {
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value);
   }
-};
 
-const fetchProductos = async (page = 1) => {
-  try {
-    if (!hasMore.value || loadingMore.value || isSearching.value) return;
-    
-    loadingMore.value = true;
-    const response = await services.getStoreProducts(props.storeSlug, page);
-    
-    if (response.data) {
-      // Asumimos que la API devuelve { results: [...], count: number }
-      const products = Array.isArray(response.data) ? response.data : response.data.results;
-      totalItems.value = response.data.count || products.length;
-      
-      if (page === 1) {
-        productos.value = products;
-        emit('products-loaded', products);
-      } else {
-        productos.value = [...productos.value, ...products];
-      }
-      
-      // Verificar si hay más páginas comparando con el total
-      const itemsPerPage = 10; // Ajusta esto según tu API
-      hasMore.value = productos.value.length < totalItems.value;
-      currentPage.value = page;
+  searchTimeout.value = setTimeout(() => {
+    // Solo resetear la búsqueda si se limpia el campo
+    if (!searchQuery.value) {
+      fetchProductos(1);
     }
-  } catch (err) {
-    console.log('Error fetching store products:', err);
-    // Si es 404, significa que no hay más páginas
-    if (err.response?.status === 404) {
-      hasMore.value = false;
-      // No emitimos error si es simplemente que no hay más páginas
-      return;
-    }
-    error.value = err;
-    emit('error', err);
-  } finally {
-    loading.value = false;
-    loadingMore.value = false;
-  }
+  }, 300);
 };
 
 const handleScroll = () => {
-  if (isSearching.value || !hasMore.value || loadingMore.value) return;
+  const scrollPosition = window.innerHeight + window.scrollY;
+  const documentHeight = document.documentElement.offsetHeight;
   
-  const scrollPosition = window.scrollY + window.innerHeight;
-  const documentHeight = document.documentElement.scrollHeight;
-  const threshold = 200; // Reducimos el umbral para evitar múltiples llamadas
-  
-  if (scrollPosition >= documentHeight - threshold) {
+  if (scrollPosition >= documentHeight - 500 && !loadingMore.value && hasMore.value && !searchQuery.value) {
     fetchProductos(currentPage.value + 1);
   }
 };
 
-// Debounce para el scroll
-let scrollTimeout;
-const debouncedScroll = () => {
-  if (scrollTimeout) clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(handleScroll, 100);
-};
-
 onMounted(() => {
   fetchProductos();
-  window.addEventListener('scroll', debouncedScroll);
+  window.addEventListener('scroll', handleScroll);
 });
 
 onUnmounted(() => {
-  if (scrollTimeout) clearTimeout(scrollTimeout);
-  window.removeEventListener('scroll', debouncedScroll);
+  window.removeEventListener('scroll', handleScroll);
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value);
+  }
 });
 </script>
 
@@ -129,53 +112,40 @@ onUnmounted(() => {
       />
     </div>
 
-    <!-- Mensaje de búsqueda -->
-    <h2 v-if="isSearching" class="text-2xl font-bold text-gray-800 mb-6">
-      Resultados para "{{ searchQuery }}"
-    </h2>
-
-    <!-- Lista de productos -->
-    <div v-if="filteredProducts.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-      <ProductCard
-        v-for="producto in filteredProducts"
-        :key="producto.id"
-        :producto="producto"
-      />
-    </div>
-
     <!-- Estado de carga inicial -->
-    <div v-else-if="loading" class="flex justify-center items-center py-12">
+    <div v-if="loading && !productos.length" class="flex justify-center items-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
     </div>
 
-    <!-- Mensaje de error -->
-    <div v-else-if="error" class="text-center py-12 text-red-500">
-      <p>Error al cargar los productos</p>
-    </div>
+    <!-- Lista de productos -->
+    <template v-else>
+      <div v-if="filteredProducts.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <ProductCard
+          v-for="producto in filteredProducts"
+          :key="producto.id"
+          :producto="producto"
+          class="product-card"
+        />
+      </div>
 
-    <!-- Mensaje de no productos -->
-    <div 
-      v-else-if="!loading && filteredProducts.length === 0" 
-      class="text-center py-12 text-gray-500"
-    >
-      <p class="text-xl">No se encontraron productos</p>
-    </div>
+      <!-- Mensaje de no productos encontrados -->
+      <div 
+        v-else
+        class="text-center py-12 text-gray-500"
+      >
+        <p class="text-xl">
+          {{ searchQuery ? `No se encontraron productos para "${searchQuery}"` : 'No hay productos disponibles' }}
+        </p>
+      </div>
 
-    <!-- Indicador de carga para más productos -->
-    <div 
-      v-if="loadingMore && !isSearching" 
-      class="flex justify-center items-center py-8"
-    >
-      <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-    </div>
-
-    <!-- Indicador de fin de lista -->
-    <div 
-      v-if="!hasMore && !isSearching && productos.length > 0" 
-      class="text-center py-8 text-gray-500"
-    >
-      No hay más productos para mostrar
-    </div>
+      <!-- Indicador de carga para más productos -->
+      <div 
+        v-if="loadingMore" 
+        class="flex justify-center items-center py-8"
+      >
+        <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+      </div>
+    </template>
   </div>
 </template>
 
