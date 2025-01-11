@@ -1,19 +1,21 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { services } from '@/services/api';
 import { ArrowRightIcon, MagnifyingGlassIcon } from '@heroicons/vue/24/outline';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const productos = ref([]);
+const allProductos = ref([]); // Almacena todos los productos sin filtrar
 const loading = ref(true);
 const loadingMore = ref(false);
 const error = ref(null);
 const currentPage = ref(1);
 const hasMore = ref(true);
 const searchQuery = ref('');
+const searchTimeout = ref(null);
 
-const fetchProductos = async (page = 1, search = '') => {
+const fetchProductos = async (page = 1) => {
   try {
     if (page === 1) {
       loading.value = true;
@@ -22,13 +24,16 @@ const fetchProductos = async (page = 1, search = '') => {
       loadingMore.value = true;
     }
 
-    const response = await services.getMarketplaceProducts(page, search);
+    const response = await services.getMarketplaceProducts(page);
     
     if (response?.data?.results) {
       if (page === 1) {
+        allProductos.value = response.data.results;
         productos.value = response.data.results;
       } else {
-        productos.value = [...productos.value, ...response.data.results];
+        const newProducts = response.data.results;
+        allProductos.value = [...allProductos.value, ...newProducts];
+        productos.value = [...productos.value, ...newProducts];
       }
       
       hasMore.value = !!response.data.next;
@@ -44,10 +49,27 @@ const fetchProductos = async (page = 1, search = '') => {
   }
 };
 
-const handleSearch = () => {
-  currentPage.value = 1;
-  fetchProductos(1, searchQuery.value);
+const filterProducts = () => {
+  const searchTerm = searchQuery.value.toLowerCase().trim();
+  if (searchTerm === '') {
+    productos.value = allProductos.value;
+  } else {
+    productos.value = allProductos.value.filter(producto => 
+      producto.nombre.toLowerCase().includes(searchTerm)
+    );
+  }
 };
+
+// Implementar búsqueda con debounce
+watch(searchQuery, (newValue) => {
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value);
+  }
+
+  searchTimeout.value = setTimeout(() => {
+    filterProducts();
+  }, 300);
+});
 
 const getImageUrl = (url) => {
   if (!url) return '/no-image.png';
@@ -61,7 +83,7 @@ const navigateToStore = (storeSlug, productId) => {
 
 const loadMore = () => {
   if (!loadingMore.value && hasMore.value) {
-    fetchProductos(currentPage.value + 1, searchQuery.value);
+    fetchProductos(currentPage.value + 1);
   }
 };
 
@@ -81,6 +103,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value);
+  }
 });
 </script>
 
@@ -92,14 +117,12 @@ onUnmounted(() => {
         <div class="relative">
           <input
             v-model="searchQuery"
-            @keyup.enter="handleSearch"
             type="text"
             placeholder="Buscar productos..."
             class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <button 
-            @click="handleSearch"
-            class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-blue-600"
+            class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500"
           >
             <MagnifyingGlassIcon class="h-5 w-5" />
           </button>

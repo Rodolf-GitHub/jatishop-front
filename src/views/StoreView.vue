@@ -11,8 +11,6 @@ const error = ref(null);
 const infoNegocio = ref(null);
 const allProducts = ref([]);
 const activeSection = ref('todos');
-const showNav = ref(true);
-const lastScrollPosition = ref(0);
 const searchQuery = ref('');
 const showOnlyProducts = computed(() => {
   return !!searchQuery.value;
@@ -43,21 +41,38 @@ const destacados = computed(() => {
   };
 });
 
-const handleScroll = () => {
-  const currentScrollPosition = window.scrollY;
-  
-  if (currentScrollPosition < 0) {
-    return;
+const scrollToSection = (sectionId) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    const offset = 180;
+    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+    window.scrollTo({
+      top: elementPosition - offset,
+      behavior: 'smooth'
+    });
+    activeSection.value = sectionId;
   }
+};
+
+const handleSearch = (query) => {
+  searchQuery.value = query;
+  activeSection.value = 'todos';
+};
+
+const filteredProducts = computed(() => {
+  if (!searchQuery.value || !allProducts.value.length) return allProducts.value;
   
-  // Mostrar/ocultar basado en la dirección del scroll
-  if (currentScrollPosition < lastScrollPosition.value || currentScrollPosition < 200) {
-    showNav.value = true;
-  } else {
-    showNav.value = false;
-  }
-  
-  lastScrollPosition.value = currentScrollPosition;
+  const query = searchQuery.value.toLowerCase().trim();
+  return allProducts.value.filter(producto => 
+    producto.nombre.toLowerCase().includes(query) ||
+    producto.descripcion?.toLowerCase().includes(query)
+  );
+});
+
+const handleLoadError = (err) => {
+  error.value = "Error al cargar los productos";
+  loading.value = false;
+  console.error('Error en StoreView:', err);
 };
 
 const handleProductsLoaded = (products) => {
@@ -77,133 +92,67 @@ const fetchStoreInfo = async () => {
   }
 };
 
-const scrollToSection = (sectionId) => {
-  const element = document.getElementById(sectionId);
-  if (element) {
-    const offset = 180; // Ajusta este valor según sea necesario
-    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-    window.scrollTo({
-      top: elementPosition - offset,
-      behavior: 'smooth'
-    });
-    activeSection.value = sectionId;
-  }
-};
-
-const handleSearch = (query) => {
-  searchQuery.value = query;
-  // Resetear la sección activa cuando se realiza una búsqueda
-  activeSection.value = 'todos';
-};
-
-// Modificar el computed de filteredProducts
-const filteredProducts = computed(() => {
-  if (!searchQuery.value || !allProducts.value.length) return allProducts.value;
-  
-  const query = searchQuery.value.toLowerCase().trim();
-  return allProducts.value.filter(producto => 
-    producto.nombre.toLowerCase().includes(query) ||
-    producto.descripcion?.toLowerCase().includes(query)
-  );
-});
-
-// Definir la función handleLoadError
-const handleLoadError = (err) => {
-  error.value = "Error al cargar los productos";
-  loading.value = false;
-  console.error('Error en StoreView:', err);
-};
-
 onMounted(() => {
   fetchStoreInfo();
-  window.addEventListener('scroll', handleScroll);
 });
 
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
-});
 </script>
 
 <template>
   <div class="bg-gray-50 min-h-screen">
-    <!-- Banner de imagen de portada -->
+    <!-- Banner de imagen de portada con overlay mejorado -->
     <div v-if="infoNegocio?.img_portada" class="w-full relative mt-[140px] md:mt-[112px] mb-8">
       <img :src="infoNegocio.img_portada" 
            :alt="infoNegocio.nombre"
            class="w-full h-64 md:h-80 lg:h-96 object-cover object-center">
-      <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60">
+        <div class="container mx-auto h-full flex items-end p-8">
+          <h1 class="text-white text-3xl md:text-4xl font-bold">
+            {{ infoNegocio.nombre }}
+          </h1>
+        </div>
+      </div>
     </div>
 
     <div class="container mx-auto px-4">
-      <!-- Mensaje de error si existe -->
-      <div v-if="error" class="text-red-500 text-center py-4">
-        {{ error }}
-      </div>
-
-      <!-- Lista infinita de productos con búsqueda integrada -->
-      <InfiniteProductList 
-        :store-slug="route.params.slug"
-        @products-loaded="handleProductsLoaded"
-        @error="handleLoadError"
-      />
-
-      <!-- Secciones adicionales solo cuando no hay búsqueda -->
-      <template v-if="!showOnlyProducts && destacados">
-        <!-- ... secciones destacadas existentes ... -->
-      </template>
-
-      <!-- Navegación de secciones destacadas -->
-      <nav 
-        class="sticky top-[112px] z-30 bg-white shadow-md transition-transform duration-300 -mx-4 px-4"
-        :class="[showNav ? 'translate-y-0' : '-translate-y-full']"
-      >
-        <div class="container mx-auto">
-          <div class="flex space-x-4 overflow-x-auto py-3 scrollbar-hide">
-            <button 
-              v-if="destacados?.ofertas?.length"
-              @click="scrollToSection('ofertas')"
-              :class="['whitespace-nowrap px-4 py-2 rounded-full transition-colors',
-                       activeSection === 'ofertas' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-blue-600']"
-            >
-              5 con mayor descuento
-            </button>
-            <button 
-              v-if="destacados?.economicos?.length"
-              @click="scrollToSection('economicos')"
-              :class="['whitespace-nowrap px-4 py-2 rounded-full transition-colors',
-                       activeSection === 'economicos' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-blue-600']"
-            >
-              5 más económicos
-            </button>
-            <button 
-              v-if="destacados?.nuevos?.length"
-              @click="scrollToSection('nuevos')"
-              :class="['whitespace-nowrap px-4 py-2 rounded-full transition-colors',
-                       activeSection === 'nuevos' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-blue-600']"
-            >
-              5 más recientes
-            </button>
-            <button 
-              v-if="destacados?.ultimas_unidades?.length"
-              @click="scrollToSection('ultimas_unidades')"
-              :class="['whitespace-nowrap px-4 py-2 rounded-full transition-colors',
-                       activeSection === 'ultimas_unidades' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-blue-600']"
-            >
-              5 últimas unidades
-            </button>
+      <!-- Mensaje de error mejorado -->
+      <div v-if="error" 
+           class="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-r-lg">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-red-700">{{ error }}</p>
           </div>
         </div>
-      </nav>
+      </div>
 
-      <!-- Secciones destacadas -->
-      <div class="mt-8">
+      <!-- Catálogo completo -->
+      <div class="mt-12 mb-16">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
+          Todo Nuestro Catálogo
+        </h2>
+        <InfiniteProductList 
+          :store-slug="route.params.slug"
+          @products-loaded="handleProductsLoaded"
+          @error="handleLoadError"
+        />
+      </div>
+
+      <!-- Secciones destacadas mejoradas -->
+      <div class="space-y-16">
         <template v-if="destacados">
           <!-- Ofertas -->
-          <section v-if="destacados.ofertas?.length" id="ofertas" class="mb-16">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+          <section v-if="destacados.ofertas?.length" id="ofertas" 
+                   class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
+              <span class="text-red-500 mr-3">🔥</span>
               5 Productos con Mayor Descuento
             </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
               <ProductCard
                 v-for="producto in destacados.ofertas"
                 :key="producto.id"
@@ -213,11 +162,13 @@ onUnmounted(() => {
           </section>
 
           <!-- Económicos -->
-          <section v-if="destacados.economicos?.length" id="economicos" class="mb-16">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+          <section v-if="destacados.economicos?.length" id="economicos" 
+                   class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
+              <span class="text-green-500 mr-3">💰</span>
               5 Productos más Económicos
             </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
               <ProductCard
                 v-for="producto in destacados.economicos"
                 :key="producto.id"
@@ -227,11 +178,13 @@ onUnmounted(() => {
           </section>
 
           <!-- Nuevos -->
-          <section v-if="destacados.nuevos?.length" id="nuevos" class="mb-16">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+          <section v-if="destacados.nuevos?.length" id="nuevos" 
+                   class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
+              <span class="text-blue-500 mr-3">✨</span>
               5 Productos más Recientes
             </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
               <ProductCard
                 v-for="producto in destacados.nuevos"
                 :key="producto.id"
@@ -241,11 +194,13 @@ onUnmounted(() => {
           </section>
 
           <!-- Últimas unidades -->
-          <section v-if="destacados.ultimas_unidades?.length" id="ultimas_unidades" class="mb-16">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+          <section v-if="destacados.ultimas_unidades?.length" id="ultimas_unidades" 
+                   class="bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
+              <span class="text-yellow-500 mr-3">⚡</span>
               5 Productos con Últimas Unidades
             </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
               <ProductCard
                 v-for="producto in destacados.ultimas_unidades"
                 :key="producto.id"
