@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { services } from "@/services/api";
-import { XMarkIcon, ChevronDownIcon } from "@heroicons/vue/24/outline";
+import { XMarkIcon, ChevronDownIcon, HomeIcon } from "@heroicons/vue/24/outline";
 
 const props = defineProps({
   isOpen: Boolean,
@@ -77,6 +77,16 @@ const navigateToSubcategoria = (categoria, subcategoria) => {
   emit('close');
 };
 
+const navigateToHome = () => {
+  router.push({
+    name: 'store',
+    params: {
+      slug: route.params.slug
+    }
+  });
+  emit('close');
+};
+
 onMounted(fetchData);
 </script>
 
@@ -108,6 +118,22 @@ onMounted(fetchData);
       <!-- Categories List -->
       <div class="flex-1 overflow-y-auto">
         <div class="py-2">
+          <!-- Sección Todos -->
+          <div class="px-4 mb-4">
+            <div 
+              class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors bg-gradient-to-r from-gray-50 to-gray-100"
+              :class="{'bg-gradient-to-r from-jati/10 to-shop/10': !route.params.id && !route.params.subcategoriaId}"
+              @click="navigateToHome"
+            >
+              <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center">
+                <HomeIcon class="h-6 w-6 text-shop" />
+              </div>
+              <span class="font-medium text-gray-700" :class="{'font-semibold text-shop': !route.params.id && !route.params.subcategoriaId}">
+                Ver Todo
+              </span>
+            </div>
+          </div>
+
           <div v-for="categoria in categorias" :key="categoria.id" class="mb-2">
             <!-- Categoría -->
             <div class="px-4">

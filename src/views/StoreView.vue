@@ -1,8 +1,7 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute } from 'vue-router';
 import { services } from "@/services/api";
-import ProductCard from "@/components/products/ProductCard.vue";
 import InfiniteProductList from "@/components/products/InfiniteProductList.vue";
 import { useCartStore } from "@/stores/cartStore";
 
@@ -13,64 +12,6 @@ const loading = ref(true);
 const error = ref(null);
 const infoNegocio = ref(null);
 const allProducts = ref([]);
-const activeSection = ref('todos');
-const searchQuery = ref('');
-const showOnlyProducts = computed(() => {
-  return !!searchQuery.value;
-});
-
-// Secciones destacadas computadas
-const destacados = computed(() => {
-  if (!allProducts.value.length) return null;
-
-  return {
-    ofertas: [...allProducts.value]
-      .filter(p => p.descuento > 0)
-      .sort((a, b) => b.descuento - a.descuento)
-      .slice(0, 5),
-      
-    economicos: [...allProducts.value]
-      .sort((a, b) => parseFloat(a.precio) - parseFloat(b.precio))
-      .slice(0, 5),
-      
-    nuevos: [...allProducts.value]
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .slice(0, 5),
-      
-    ultimas_unidades: [...allProducts.value]
-      .filter(p => p.stock <= 5 && p.stock > 0)
-      .sort((a, b) => a.stock - b.stock)
-      .slice(0, 5)
-  };
-});
-
-const scrollToSection = (sectionId) => {
-  const element = document.getElementById(sectionId);
-  if (element) {
-    const offset = 180;
-    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-    window.scrollTo({
-      top: elementPosition - offset,
-      behavior: 'smooth'
-    });
-    activeSection.value = sectionId;
-  }
-};
-
-const handleSearch = (query) => {
-  searchQuery.value = query;
-  activeSection.value = 'todos';
-};
-
-const filteredProducts = computed(() => {
-  if (!searchQuery.value || !allProducts.value.length) return allProducts.value;
-  
-  const query = searchQuery.value.toLowerCase().trim();
-  return allProducts.value.filter(producto => 
-    producto.nombre.toLowerCase().includes(query) ||
-    producto.descripcion?.toLowerCase().includes(query)
-  );
-});
 
 const handleLoadError = (err) => {
   if (loading.value) {
@@ -114,7 +55,7 @@ onMounted(() => {
 <template>
   <div class="bg-gray-50 min-h-screen">
     <!-- Banner de imagen de portada con overlay mejorado -->
-    <div v-if="infoNegocio?.img_portada" class="w-full relative mt-[140px] md:mt-[112px] mb-8">
+    <div v-if="infoNegocio?.img_portada" class="w-full relative mt-[72px] mb-8">
       <img :src="infoNegocio.img_portada" 
            :alt="infoNegocio.nombre"
            class="w-full h-64 md:h-80 lg:h-96 object-cover object-center">
@@ -143,75 +84,6 @@ onMounted(() => {
           @products-loaded="handleProductsLoaded"
           @error="handleLoadError"
         />
-      </div>
-
-      <!-- Secciones destacadas mejoradas -->
-      <div class="space-y-16">
-        <template v-if="destacados">
-          <!-- Ofertas -->
-          <section v-if="destacados.ofertas?.length" id="ofertas" 
-                   class="bg-white rounded-2xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
-              <span class="text-red-500 mr-3">🔥</span>
-              5 Productos con Mayor Descuento
-            </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-              <ProductCard
-                v-for="producto in destacados.ofertas"
-                :key="producto.id"
-                :producto="producto"
-              />
-            </div>
-          </section>
-
-          <!-- Económicos -->
-          <section v-if="destacados.economicos?.length" id="economicos" 
-                   class="bg-white rounded-2xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
-              <span class="text-green-500 mr-3">💰</span>
-              5 Productos más Económicos
-            </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-              <ProductCard
-                v-for="producto in destacados.economicos"
-                :key="producto.id"
-                :producto="producto"
-              />
-            </div>
-          </section>
-
-          <!-- Nuevos -->
-          <section v-if="destacados.nuevos?.length" id="nuevos" 
-                   class="bg-white rounded-2xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
-              <span class="text-blue-500 mr-3">✨</span>
-              5 Productos más Recientes
-            </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-              <ProductCard
-                v-for="producto in destacados.nuevos"
-                :key="producto.id"
-                :producto="producto"
-              />
-            </div>
-          </section>
-
-          <!-- Últimas unidades -->
-          <section v-if="destacados.ultimas_unidades?.length" id="ultimas_unidades" 
-                   class="bg-white rounded-2xl shadow-lg p-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-8 flex items-center">
-              <span class="text-yellow-500 mr-3">⚡</span>
-              5 Productos con Últimas Unidades
-            </h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-              <ProductCard
-                v-for="producto in destacados.ultimas_unidades"
-                :key="producto.id"
-                :producto="producto"
-              />
-            </div>
-          </section>
-        </template>
       </div>
     </div>
   </div>

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import {
   Bars3Icon,
@@ -23,6 +23,7 @@ const emit = defineEmits(['search']);
 const router = useRouter();
 const route = useRoute();
 const isSideBarOpen = ref(false);
+const showCurrencyTooltip = ref(false);
 
 const homeRoute = computed(() => ({
   name: 'store',
@@ -48,15 +49,16 @@ const handleSearch = (query) => {
 };
 
 const getMonedaTitle = (moneda) => {
-  const monedas = {
-    'CUP': 'Pesos Cubanos',
-    'USD': 'Dólares Americanos',
-    'EUR': 'Euros',
-    'ZELLE': 'Zelle',
-    'MLC': 'Moneda Libremente Convertible'
-  };
-  return monedas[moneda] || moneda;
+  return `Esta es la moneda principal en la que opera la tienda: ${moneda}`;
 };
+
+const toggleCurrencyTooltip = () => {
+  showCurrencyTooltip.value = true;
+  setTimeout(() => {
+    showCurrencyTooltip.value = false;
+  }, 3000);
+};
+
 </script>
 
 <template>
@@ -64,91 +66,115 @@ const getMonedaTitle = (moneda) => {
     <nav class="fixed top-0 left-0 right-0 bg-gray-50 shadow-lg z-40">
       <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div class="flex flex-col">
-          <!-- Barra superior -->
-          <div class="flex items-center h-14 md:h-16">
-            <!-- Sección izquierda -->
-            <div class="flex items-center">
-              <button
-                v-if="store"
-                @click="isSideBarOpen = true"
-                class="p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
+          <div class="flex flex-col md:flex-row">
+            <div class="flex items-center h-14 md:h-16 w-full">
+              <div class="flex items-center gap-2">
+                <button
+                  v-if="store"
+                  @click="isSideBarOpen = true"
+                  class="p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
+                >
+                  <Bars3Icon class="h-7 w-7 text-jati stroke-[2.5]" />
+                </button>
+
+                <a 
+                  v-if="store"
+                  href="#"
+                  @click.prevent="router.push(homeRoute)"
+                  class="flex items-center gap-2"
+                >
+                  <img 
+                    v-if="store?.logo" 
+                    :src="store.logo"
+                    class="h-8 w-8 md:h-10 md:w-10 object-cover rounded-full"
+                    alt="Logo"
+                  />
+                  <span class="text-lg md:text-xl font-bold gradient-text">
+                    {{ store?.nombre }}
+                  </span>
+                </a>
+              </div>
+
+              <div 
+                v-if="store && showSearch" 
+                class="hidden md:flex flex-1 justify-center px-8"
               >
-                <Bars3Icon class="h-7 w-7 text-jati stroke-[2.5]" />
-              </button>
+                <SearchBar @filter="handleSearch" />
+              </div>
 
-              <!-- Logo y nombre de la tienda -->
-              <a 
-                v-if="store"
-                href="#"
-                @click.prevent="router.push(homeRoute)"
-                class="flex items-center gap-2 ml-2 md:ml-4"
-              >
-                <img 
-                  v-if="store?.logo" 
-                  :src="store.logo"
-                  class="h-8 w-8 md:h-10 md:w-10 object-cover rounded-full"
-                  alt="Logo"
-                />
-                <span class="text-lg md:text-xl font-bold gradient-text">
-                  {{ store?.nombre }}
-                </span>
-              </a>
+              <div class="ml-auto flex items-center gap-2">
+                <a 
+                  href="/"
+                  class="flex items-center gap-2 p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
+                >
+                  <img 
+                    src="/logo.jpg"
+                    class="h-7 w-7 object-cover rounded-full"
+                    alt="E-comCuba"
+                  />
+                  <span class="hidden md:block text-sm">E-comCuba</span>
+                </a>
+              </div>
             </div>
+          </div>
 
-            <!-- Sección central (SearchBar en desktop) -->
-            <div 
-              v-if="store && showSearch" 
-              class="hidden md:flex flex-1 justify-center px-8"
-            >
-              <SearchBar @filter="handleSearch" />
-            </div>
-
-            <!-- Sección derecha -->
-            <div v-if="store" class="flex items-center space-x-2 md:space-x-4 ml-auto">
+          <div v-if="store" class="flex justify-between items-center py-2">
+            <div class="flex justify-between items-center w-full">
               <div
-                class="flex items-center p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
-                :title="getMonedaTitle(store?.moneda_principal)"
+                class="relative flex items-center p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md cursor-help"
+                @click="toggleCurrencyTooltip"
               >
                 <CurrencyDollarIcon class="h-7 w-7 text-jati stroke-[2.5]" />
                 <span class="text-sm font-medium text-jati ml-1 mr-1">
                   {{store?.moneda_principal}}
                 </span>
+                <transition name="fade">
+                  <div 
+                    v-if="showCurrencyTooltip"
+                    class="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-3 bg-black/90 text-white text-sm rounded-lg shadow-xl z-50 backdrop-blur-sm"
+                  >
+                    {{ getMonedaTitle(store?.moneda_principal) }}
+                  </div>
+                </transition>
               </div>
+
               <a
                 href="#"
                 @click.prevent="router.push(ubicacionRoute)"
-                class="p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
+                class="flex items-center p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
                 title="Ubicación"
               >
                 <MapPinIcon class="h-7 w-7 text-jati hover:text-shop transition-colors stroke-[2.5]" />
+                <span class="block text-sm ml-1">Ubicación</span>
               </a>
+
               <a
                 href="#"
                 @click.prevent="router.push(ayudaRoute)"
-                class="p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
+                class="flex items-center p-1.5 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
                 title="Ayuda"
               >
                 <QuestionMarkCircleIcon class="h-7 w-7 text-jati hover:text-shop transition-colors stroke-[2.5]" />
+                <span class="block text-sm ml-1">Ayuda</span>
               </a>
             </div>
-          </div>
 
-          <!-- SearchBar y Breadcrumb -->
-          <div v-if="store" class="pb-2 md:pb-3">
             <div 
               v-if="showSearch" 
-              class="md:hidden mb-1"
+              class="md:hidden flex-1 mx-4"
             >
               <SearchBar @filter="handleSearch" />
             </div>
+          </div>
+
+          <div v-if="store" class="pb-2 md:pb-3">
             <Breadcrumb />
           </div>
         </div>
       </div>
     </nav>
 
-    <!-- Ajustar el espaciador -->
-    <div :class="{'h-24 md:h-28': store, 'h-14 md:h-16': !store}"></div>
+    <div :class="{'h-32 md:h-28': store, 'h-14 md:h-16': !store}"></div>
 
     <SideBar 
       v-if="store"
@@ -178,5 +204,15 @@ const getMonedaTitle = (moneda) => {
   to {
     background-position: 200% center;
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

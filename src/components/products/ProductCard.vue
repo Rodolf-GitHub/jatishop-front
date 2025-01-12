@@ -91,7 +91,10 @@ const agregarAlCarrito = () => {
     if (!props.producto.stock) {
       throw new Error('Producto sin stock disponible');
     }
-    cartStore.addToCart(props.producto);
+    // Añadir al carrito con la cantidad seleccionada
+    for(let i = 0; i < cantidad.value; i++) {
+      cartStore.addToCart(props.producto);
+    }
     cantidad.value = 1; // Reset cantidad después de agregar
   } catch (error) {
     alertMessage.value = error.message;

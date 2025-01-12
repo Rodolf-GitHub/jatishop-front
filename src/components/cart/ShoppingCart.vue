@@ -10,6 +10,7 @@ import {
 } from "@heroicons/vue/24/outline";
 import { useRouter, useRoute } from 'vue-router'
 import CheckoutModal from './CheckoutModal.vue'
+import IconWhatsApp from '@/components/icons/IconWhatsApp.vue'
 
 const cartStore = useCartStore();
 const showCart = ref(false);
@@ -59,8 +60,21 @@ const handleEscKey = (event) => {
   }
 };
 
-onMounted(() => {
+const generateWhatsAppLink = () => {
+  if (!infoNegocio.value?.whatsapp) return '#';
+  return `${infoNegocio.value.whatsapp}`;
+};
+
+onMounted(async () => {
   document.addEventListener("keydown", handleEscKey);
+  try {
+    if (route.params.slug) {
+      const response = await services.getStore(route.params.slug);
+      infoNegocio.value = response.data;
+    }
+  } catch (error) {
+    console.error("Error al obtener información del negocio:", error);
+  }
 });
 
 onUnmounted(() => {
@@ -70,6 +84,17 @@ onUnmounted(() => {
 
 <template>
   <div>
+    <!-- Botón de WhatsApp -->
+    <a
+      v-if="infoNegocio?.whatsapp"
+      :href="generateWhatsAppLink()"
+      target="_blank"
+      class="fixed bottom-4 right-20 z-40 bg-green-500 text-white p-2.5 rounded-full shadow-lg hover:bg-green-600 transition-colors"
+      title="Contactar por WhatsApp"
+    >
+      <IconWhatsApp class="h-5 w-5" />
+    </a>
+
     <!-- Botón del carrito -->
     <button
       @click="showCart = true"
@@ -211,3 +236,14 @@ onUnmounted(() => {
     />
   </div>
 </template>
+
+<style scoped>
+/* Añadir animación de hover suave */
+a, button {
+  transition: all 0.2s ease-in-out;
+}
+
+a:hover, button:hover {
+  transform: scale(1.05);
+}
+</style>

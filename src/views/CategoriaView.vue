@@ -72,10 +72,7 @@ watch(
 
 <template>
   <div class="container mx-auto px-4 mt-[120px]">
-    <!-- Título de la categoría -->
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">
-      Mostrando productos de {{ categoriaInfo }}
-    </h1>
+
 
     <!-- Loading state -->
     <div v-if="loading" class="flex justify-center items-center min-h-[400px]">

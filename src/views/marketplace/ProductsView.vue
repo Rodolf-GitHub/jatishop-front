@@ -7,7 +7,7 @@ import { getImageUrl } from "@/utils/image";
 
 const router = useRouter();
 const productos = ref([]);
-const allProductos = ref([]); // Almacena todos los productos sin filtrar
+const allProductos = ref([]);
 const loading = ref(true);
 const loadingMore = ref(false);
 const error = ref(null);
@@ -60,7 +60,6 @@ const filterProducts = () => {
   }
 };
 
-// Implementar búsqueda con debounce
 watch(searchQuery, (newValue) => {
   if (searchTimeout.value) {
     clearTimeout(searchTimeout.value);
@@ -114,7 +113,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="products-container max-w-7xl mx-auto mt-[112px]">
+  <div class="products-container max-w-7xl mx-auto">
     <!-- Search bar -->
     <div class="fixed-search">
       <div class="max-w-xl mx-auto">
@@ -133,9 +132,6 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-
-    <!-- Spacer para compensar el search bar fijo -->
-    <div class="h-24"></div>
 
     <!-- Loading state -->
     <div v-if="loading" class="loading">
@@ -230,11 +226,12 @@ onUnmounted(() => {
 <style scoped>
 .products-container {
   padding: 20px;
+  margin-top: 145px;
 }
 
 .fixed-search {
   position: fixed;
-  top: 56px;
+  top: 105px;
   left: 0;
   right: 0;
   background-color: white;
