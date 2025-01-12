@@ -78,7 +78,7 @@ onMounted(async () => {
             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             <div class="absolute -bottom-12 left-6">
               <img
-                :src="getStoreImageUrl(store.logo)"
+                :src="getImageUrl(store.logo)"
                 :alt="store.nombre"
                 class="w-24 h-24 rounded-xl border-4 border-white shadow-lg object-cover bg-white"
                 @error="$event.target.src = '/no-image.png'"
