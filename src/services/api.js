@@ -12,17 +12,21 @@ const api = axios.create({
 
 export const services = {
   // Marketplace
-  getStores: () => api.get("/marketplace/negocios/"),
-  getMarketplaceProducts: (page = 1, search = '') => {
-    console.log('API URL:', API_URL); // Debug
-    console.log('Making request to:', `${API_URL}/marketplace/productos/`); // Debug
+  getStores: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.provincia) queryParams.append('provincia', params.provincia);
+    if (params.municipio) queryParams.append('municipio', params.municipio);
+    if (params.search) queryParams.append('search', params.search);
     
-    return api.get('/marketplace/productos/', {
-      params: {
-        page,
-        ...(search && { search })
-      }
-    });
+    return api.get(`/marketplace/negocios/?${queryParams.toString()}`);
+  },
+  getMarketplaceProducts: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    if (params.provincia) queryParams.append('provincia', params.provincia);
+    if (params.municipio) queryParams.append('municipio', params.municipio);
+    if (params.search) queryParams.append('search', params.search);
+    
+    return api.get(`/marketplace/productos/?${queryParams.toString()}`);
   },
   
   // Tienda específica
@@ -68,6 +72,16 @@ export const services = {
     return api.get(`/tienda/${storeSlug}/productos/`, {
       params: { page }
     });
+  },
+
+  // Obtener lista de provincias
+  getProvincias() {
+    return api.get('/ubicaciones/provincias/');
+  },
+
+  // Obtener municipios de una provincia específica - Corregida la URL
+  getMunicipios(provincia) {
+    return api.get(`/ubicaciones/municipios/${encodeURIComponent(provincia)}/`);
   },
 };
 

@@ -1,12 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { services } from '@/services/api'
 import { getImageUrl } from '@/utils/image'
+import { useMarketplaceStore } from '@/stores/marketplace'
 import { MapPinIcon, PhoneIcon, EnvelopeIcon, ClockIcon } from '@heroicons/vue/24/outline'
 
 const stores = ref([])
 const loading = ref(true)
 const error = ref(null)
+const marketplaceStore = useMarketplaceStore()
 
 const getStoreImageUrl = (url) => {
   if (!url) return '/no-image.png';
@@ -14,9 +16,17 @@ const getStoreImageUrl = (url) => {
   return `${MEDIA_URL}${url}`;
 };
 
-onMounted(async () => {
+const loadStores = async () => {
+  loading.value = true;
   try {
-    const response = await services.getStores()
+    const params = {};
+    if (marketplaceStore.filters.provincia) {
+      params.provincia = marketplaceStore.filters.provincia;
+      if (marketplaceStore.filters.municipio) {
+        params.municipio = marketplaceStore.filters.municipio;
+      }
+    }
+    const response = await services.getStores(params)
     stores.value = response.data
   } catch (err) {
     error.value = 'Error al cargar las tiendas'
@@ -24,6 +34,19 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+// Observar cambios en los filtros
+watch(
+  () => marketplaceStore.filters,
+  () => {
+    loadStores()
+  },
+  { deep: true }
+)
+
+onMounted(() => {
+  loadStores()
 })
 </script>
 

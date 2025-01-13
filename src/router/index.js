@@ -22,6 +22,11 @@ const router = createRouter({
           component: StoresListView
         },
         {
+          path: 'admin',
+          name: 'store-admin',
+          component: () => import("../views/marketplace/AdminView.vue"),
+        },
+        {
           path: 'acerca',
           name: 'marketplace-about',
           component: () => import("../views/marketplace/HomeView.vue"),
@@ -37,6 +42,7 @@ const router = createRouter({
           name: 'store',
           component: StoreView
         },
+        
         {
           path: 'ayuda',
           name: 'store-ayuda',

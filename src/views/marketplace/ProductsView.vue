@@ -4,6 +4,7 @@ import { services } from "@/services/api";
 import { ArrowRightIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
 import { useRouter } from "vue-router";
 import { getImageUrl } from "@/utils/image";
+import { useMarketplaceStore } from "@/stores/marketplace";
 
 const router = useRouter();
 const productos = ref([]);
@@ -15,6 +16,7 @@ const currentPage = ref(1);
 const hasMore = ref(true);
 const searchQuery = ref("");
 const searchTimeout = ref(null);
+const marketplaceStore = useMarketplaceStore();
 
 const fetchProductos = async (page = 1) => {
   try {
@@ -25,7 +27,14 @@ const fetchProductos = async (page = 1) => {
       loadingMore.value = true;
     }
 
-    const response = await services.getMarketplaceProducts(page);
+    const params = {};
+    if (marketplaceStore.filters.provincia) {
+      params.provincia = marketplaceStore.filters.provincia;
+      if (marketplaceStore.filters.municipio) {
+        params.municipio = marketplaceStore.filters.municipio;
+      }
+    }
+    const response = await services.getMarketplaceProducts(params);
 
     if (response?.data?.results) {
       if (page === 1) {
@@ -98,6 +107,14 @@ const handleScroll = () => {
     loadMore();
   }
 };
+
+watch(
+  () => marketplaceStore.filters,
+  () => {
+    fetchProductos();
+  },
+  { deep: true }
+);
 
 onMounted(() => {
   fetchProductos();
