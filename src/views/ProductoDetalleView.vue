@@ -5,6 +5,8 @@ import { services } from '@/services/api';
 import { useCartStore } from '@/stores/cartStore';
 import { getImageUrl } from '@/utils/image';
 import { PlusIcon, MinusIcon } from "@heroicons/vue/24/outline";
+import { useHead } from '@vueuse/head';
+import axios from 'axios';
 
 const route = useRoute();
 const producto = ref(null);
@@ -40,6 +42,17 @@ const fetchProducto = async () => {
     error.value = null;
     const response = await services.getProducto(route.params.slug, route.params.productoId);
     producto.value = response.data;
+    
+    const imagenUrl = new URL(producto.value.imagen, window.location.origin).href;
+    
+    useHead({
+      meta: [
+        { property: 'og:title', content: producto.value.nombre },
+        { property: 'og:description', content: producto.value.descripcion },
+        { property: 'og:image', content: imagenUrl },
+        { property: 'og:url', content: window.location.href }
+      ]
+    });
   } catch (err) {
     console.error("Error al cargar el producto:", err);
     error.value = "Error al cargar el producto";
@@ -113,7 +126,6 @@ const compartirProducto = async () => {
   }
 };
 </script>
-
 <template>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Loading state -->
@@ -289,3 +301,4 @@ const compartirProducto = async () => {
   color: var(--color-primary);
 }
 </style>
+

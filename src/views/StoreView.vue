@@ -34,6 +34,13 @@ const fetchStoreInfo = async () => {
     const response = await services.getStore(route.params.slug);
     infoNegocio.value = response.data;
     
+    // Actualizar meta tags para compartir
+    document.querySelector('meta[property="og:title"]').setAttribute('content', infoNegocio.value.nombre);
+    document.querySelector('meta[property="og:description"]').setAttribute('content', infoNegocio.value.descripcion || 'Tienda en E-comCuba');
+    document.querySelector('meta[property="og:image"]').setAttribute('content', infoNegocio.value.logo);
+    document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
+    document.title = infoNegocio.value.nombre;
+    
     // Inicializar el carrito para esta tienda
     cartStore.setCurrentStore(route.params.slug, {
       nombre: response.data.nombre,
@@ -51,7 +58,6 @@ onMounted(() => {
 });
 
 </script>
-
 <template>
   <div class="bg-gray-50 min-h-screen">
     <!-- Banner de imagen de portada con overlay mejorado -->

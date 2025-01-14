@@ -22,7 +22,8 @@ const generateOrderText = () => {
   const items = props.cartItems.map(item => 
     `• ${item.cantidad}x ${item.producto.nombre}\n` +
     `  💰 $${item.producto.precio_con_descuento}\n` + 
-    `  📦 Total: $${(item.producto.precio_con_descuento * item.cantidad).toFixed(2)}`
+    `  📦 Total: $${(item.producto.precio_con_descuento * item.cantidad).toFixed(2)}\n` +
+    `  🔗 https://e-comcuba.com/store/${props.infoNegocio.slug}/producto/${item.producto.id}`
   ).join("\n\n");
   
   return `${header}${items}\n\n💵 Total: $${props.totalAmount}`;
