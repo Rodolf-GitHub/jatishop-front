@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { services } from '@/services/api';
+import { PROVINCIAS, getMunicipios } from '@/utils/ubicaciones';
 
 const props = defineProps({
   modelValue: {
@@ -11,39 +11,20 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue']);
 
-const provincias = ref([]);
+const provincias = ref(PROVINCIAS);
 const municipios = ref([]);
 const selectedProvincia = ref(props.modelValue.provincia || '');
 const selectedMunicipio = ref(props.modelValue.municipio || '');
 
-const loadProvincias = async () => {
-  try {
-    const response = await services.getProvincias();
-    console.log('Provincias cargadas:', response.data);
-    provincias.value = response.data;
-  } catch (error) {
-    console.error('Error al cargar provincias:', error);
-  }
-};
-
-const loadMunicipios = async (provincia) => {
+const loadMunicipios = (provincia) => {
   if (!provincia) {
     municipios.value = [];
     return;
   }
-  
-  try {
-    const response = await services.getMunicipios(provincia);
-    console.log('Municipios cargados:', response.data);
-    municipios.value = response.data;
-  } catch (error) {
-    console.error('Error al cargar municipios:', error);
-  }
+  municipios.value = getMunicipios(provincia);
 };
 
-// Actualizar el modelo cuando cambia la provincia
 watch(selectedProvincia, (newProvincia) => {
-  console.log('Provincia seleccionada:', newProvincia);
   selectedMunicipio.value = '';
   loadMunicipios(newProvincia);
   emit('update:modelValue', {
@@ -52,18 +33,14 @@ watch(selectedProvincia, (newProvincia) => {
   });
 });
 
-// Actualizar el modelo cuando cambia el municipio
 watch(selectedMunicipio, (newMunicipio) => {
-  console.log('Municipio seleccionado:', newMunicipio);
   emit('update:modelValue', {
     provincia: selectedProvincia.value,
     municipio: newMunicipio
   });
 });
 
-// Sincronizar con cambios externos
 watch(() => props.modelValue, (newValue) => {
-  console.log('Modelo actualizado externamente:', newValue);
   if (newValue.provincia !== selectedProvincia.value) {
     selectedProvincia.value = newValue.provincia;
   }
@@ -72,11 +49,9 @@ watch(() => props.modelValue, (newValue) => {
   }
 }, { deep: true });
 
-onMounted(async () => {
-  console.log('Componente montado, cargando provincias...');
-  await loadProvincias();
+onMounted(() => {
   if (props.modelValue.provincia) {
-    await loadMunicipios(props.modelValue.provincia);
+    loadMunicipios(props.modelValue.provincia);
   }
 });
 </script>

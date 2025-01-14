@@ -1,25 +1,23 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from "vue";
-import { services } from "@/services/api";
-import { ArrowRightIcon, MagnifyingGlassIcon } from "@heroicons/vue/24/outline";
-import { useRouter } from "vue-router";
-import { getImageUrl } from "@/utils/image";
 import { useMarketplaceStore } from "@/stores/marketplace";
+import MarketplaceProductCard from "@/components/marketplace/MarketplaceProductCard.vue";
+import axios from 'axios';
 
-const router = useRouter();
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+const marketplaceStore = useMarketplaceStore();
+
 const productos = ref([]);
-const allProductos = ref([]);
 const loading = ref(true);
 const loadingMore = ref(false);
 const error = ref(null);
 const currentPage = ref(1);
 const hasMore = ref(true);
-const searchQuery = ref("");
-const searchTimeout = ref(null);
-const marketplaceStore = useMarketplaceStore();
 
 const fetchProductos = async (page = 1) => {
   try {
+    if (loading.value || loadingMore.value) return;
+
     if (page === 1) {
       loading.value = true;
       productos.value = [];
@@ -27,30 +25,58 @@ const fetchProductos = async (page = 1) => {
       loadingMore.value = true;
     }
 
-    const params = {};
+    const urlParams = new URLSearchParams();
+    
     if (marketplaceStore.filters.provincia) {
-      params.provincia = marketplaceStore.filters.provincia;
-      if (marketplaceStore.filters.municipio) {
-        params.municipio = marketplaceStore.filters.municipio;
-      }
+      urlParams.append('provincia', marketplaceStore.filters.provincia);
     }
-    const response = await services.getMarketplaceProducts(params);
-
-    if (response?.data?.results) {
-      if (page === 1) {
-        allProductos.value = response.data.results;
-        productos.value = response.data.results;
-      } else {
-        const newProducts = response.data.results;
-        allProductos.value = [...allProductos.value, ...newProducts];
-        productos.value = [...productos.value, ...newProducts];
-      }
-
-      hasMore.value = !!response.data.next;
-      currentPage.value = page;
+    if (marketplaceStore.filters.municipio) {
+      urlParams.append('municipio', marketplaceStore.filters.municipio);
     }
+    urlParams.append('page', page.toString());
+
+    const url = `${API_URL}/marketplace/productos/?${urlParams.toString()}`;
+    console.log('Realizando petición a:', url);
+    
+    const response = await axios.get(url);
+    console.log('Respuesta de productos:', response.data.results);
+
+    if (!response?.data?.results?.length) {
+      hasMore.value = false;
+      return;
+    }
+
+    const productosFormateados = response.data.results.map(producto => ({
+      id: producto.id,
+      nombre: producto.nombre,
+      descripcion: producto.descripcion,
+      precio: producto.precio,
+      precio_con_descuento: producto.precio_con_descuento,
+      stock: producto.stock,
+      descuento: producto.descuento,
+      imagen: producto.imagen,
+      activo: producto.activo,
+      created_at: producto.created_at,
+      updated_at: producto.updated_at,
+      subcategoria: producto.subcategoria,
+      tienda_nombre: producto.tienda_nombre,
+      tienda_slug: producto.tienda_slug,
+      tienda_id: producto.tienda_id
+    }));
+
+    if (page === 1) {
+      productos.value = productosFormateados;
+    } else {
+      productos.value = [...productos.value, ...productosFormateados];
+    }
+
+    hasMore.value = !!response.data.next;
+    if (hasMore.value) {
+      currentPage.value = page + 1;
+    }
+
   } catch (err) {
-    error.value = "Error al cargar los productos";
+    hasMore.value = false;
     console.error("Error:", err);
   } finally {
     loading.value = false;
@@ -58,52 +84,15 @@ const fetchProductos = async (page = 1) => {
   }
 };
 
-const filterProducts = () => {
-  const searchTerm = searchQuery.value.toLowerCase().trim();
-  if (searchTerm === "") {
-    productos.value = allProductos.value;
-  } else {
-    productos.value = allProductos.value.filter((producto) =>
-      producto.nombre.toLowerCase().includes(searchTerm)
-    );
-  }
-};
-
-watch(searchQuery, (newValue) => {
-  if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value);
-  }
-
-  searchTimeout.value = setTimeout(() => {
-    filterProducts();
-  }, 300);
-});
-
-const productImageUrl = (url) => {
-  if (!url) return "/no-image.png";
-  const MEDIA_URL = import.meta.env.VITE_MEDIA_URL;
-  return `$${url}`;
-};
-
-const navigateToStore = (storeSlug, productId) => {
-  router.push(`/store/${storeSlug}/producto/${productId}`);
-};
-
 const loadMore = () => {
-  if (!loadingMore.value && hasMore.value) {
-    fetchProductos(currentPage.value + 1);
+  if (hasMore.value && !loading.value && !loadingMore.value) {
+    console.log('Cargando página:', currentPage.value);
+    fetchProductos(currentPage.value);
   }
 };
 
 const handleScroll = () => {
-  const scrollPosition = window.innerHeight + window.scrollY;
-  const documentHeight = document.documentElement.offsetHeight;
-
-  if (
-    scrollPosition >= documentHeight - 500 &&
-    !loadingMore.value &&
-    hasMore.value
-  ) {
+  if (window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 500) {
     loadMore();
   }
 };
@@ -123,38 +112,14 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
-  if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value);
-  }
 });
 </script>
 
 <template>
   <div class="products-container max-w-7xl mx-auto">
-    <!-- Search bar -->
-    <div class="fixed-search">
-      <div class="max-w-xl mx-auto">
-        <div class="relative">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Buscar productos..."
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <button
-            class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-500"
-          >
-            <MagnifyingGlassIcon class="h-5 w-5" />
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Loading state -->
     <div v-if="loading" class="loading">
-      <div
-        class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto"
-      ></div>
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto"></div>
       <p class="mt-4 text-gray-600">Cargando productos...</p>
     </div>
 
@@ -166,63 +131,14 @@ onUnmounted(() => {
     <!-- Products grid -->
     <div v-else class="products-grid">
       <div
-        v-if="productos && productos.length > 0"
+        v-if="productos.length > 0"
         class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"
       >
-        <div
+        <MarketplaceProductCard
           v-for="producto in productos"
           :key="producto.id"
-          class="product-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-        >
-          <!-- Imagen -->
-          <div
-            class="relative aspect-square cursor-pointer"
-            @click="navigateToStore(producto.tienda.slug, producto.id)"
-          >
-            <img
-              :src="getImageUrl(producto.imagen)"
-              :alt="producto.nombre"
-              class="w-full h-full object-contain bg-gray-50 p-2"
-            />
-            <div
-              v-if="producto.descuento > 0"
-              class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"
-            >
-              -{{ producto.descuento }}%
-            </div>
-          </div>
-
-          <!-- Info -->
-          <div class="p-4">
-            <p class="text-sm text-blue-600 mb-1 hover:text-blue-700">
-              {{ producto.tienda.nombre }}
-            </p>
-
-            <h3 class="font-medium text-gray-900 mb-1 line-clamp-2 h-12">
-              {{ producto.nombre }}
-            </h3>
-
-            <div class="flex items-baseline gap-2 mb-3">
-              <span class="text-lg font-bold text-gray-900">
-                ${{ producto.precio_con_descuento }}
-              </span>
-              <span
-                v-if="producto.descuento > 0"
-                class="text-sm text-gray-500 line-through"
-              >
-                ${{ producto.precio }}
-              </span>
-            </div>
-
-            <button
-              @click="navigateToStore(producto.tienda.slug, producto.id)"
-              class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-            >
-              Ver en tienda
-              <ArrowRightIcon class="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+          :producto="producto"
+        />
       </div>
 
       <div v-else class="no-products bg-gray-50 rounded-lg p-8 text-center">
@@ -231,9 +147,7 @@ onUnmounted(() => {
 
       <!-- Loading more indicator -->
       <div v-if="loadingMore" class="loading-more">
-        <div
-          class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mx-auto"
-        ></div>
+        <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mx-auto"></div>
         <p class="mt-2 text-gray-600">Cargando más productos...</p>
       </div>
     </div>
@@ -243,18 +157,7 @@ onUnmounted(() => {
 <style scoped>
 .products-container {
   padding: 20px;
-  margin-top: 145px;
-}
-
-.fixed-search {
-  position: fixed;
-  top: 105px;
-  left: 0;
-  right: 0;
-  background-color: white;
-  padding: 20px;
-  z-index: 40;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
 }
 
 .loading,
@@ -268,13 +171,5 @@ onUnmounted(() => {
   text-align: center;
   padding: 20px;
   margin-top: 20px;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  line-clamp: 2;
-  overflow: hidden;
 }
 </style>
