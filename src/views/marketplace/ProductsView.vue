@@ -1,9 +1,11 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from "vue";
 import { useMarketplaceStore } from "@/stores/marketplace";
+import { useRoute, useRouter } from "vue-router";
 import MarketplaceProductCard from "@/components/marketplace/MarketplaceProductCard.vue";
-import axios from 'axios';
+import axios from "axios";
 
+const route = useRoute();
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 const marketplaceStore = useMarketplaceStore();
 
@@ -26,27 +28,27 @@ const fetchProductos = async (page = 1) => {
     }
 
     const urlParams = new URLSearchParams();
-    
+
     if (marketplaceStore.filters.provincia) {
-      urlParams.append('provincia', marketplaceStore.filters.provincia);
+      urlParams.append("provincia", marketplaceStore.filters.provincia);
     }
     if (marketplaceStore.filters.municipio) {
-      urlParams.append('municipio', marketplaceStore.filters.municipio);
+      urlParams.append("municipio", marketplaceStore.filters.municipio);
     }
-    urlParams.append('page', page.toString());
+    urlParams.append("page", page.toString());
 
     const url = `${API_URL}/marketplace/productos/?${urlParams.toString()}`;
-    console.log('Realizando petición a:', url);
-    
+    console.log("Realizando petición a:", url);
+
     const response = await axios.get(url);
-    console.log('Respuesta de productos:', response.data.results);
+    console.log("Respuesta de productos:", response.data.results);
 
     if (!response?.data?.results?.length) {
       hasMore.value = false;
       return;
     }
 
-    const productosFormateados = response.data.results.map(producto => ({
+    const productosFormateados = response.data.results.map((producto) => ({
       id: producto.id,
       nombre: producto.nombre,
       descripcion: producto.descripcion,
@@ -61,7 +63,7 @@ const fetchProductos = async (page = 1) => {
       subcategoria: producto.subcategoria,
       tienda_nombre: producto.tienda_nombre,
       tienda_slug: producto.tienda_slug,
-      tienda_id: producto.tienda_id
+      tienda_id: producto.tienda_id,
     }));
 
     if (page === 1) {
@@ -74,7 +76,6 @@ const fetchProductos = async (page = 1) => {
     if (hasMore.value) {
       currentPage.value = page + 1;
     }
-
   } catch (err) {
     hasMore.value = false;
     console.error("Error:", err);
@@ -86,13 +87,16 @@ const fetchProductos = async (page = 1) => {
 
 const loadMore = () => {
   if (hasMore.value && !loading.value && !loadingMore.value) {
-    console.log('Cargando página:', currentPage.value);
+    console.log("Cargando página:", currentPage.value);
     fetchProductos(currentPage.value);
   }
 };
 
 const handleScroll = () => {
-  if (window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 500) {
+  if (
+    window.innerHeight + window.scrollY >=
+    document.documentElement.offsetHeight - 500
+  ) {
     loadMore();
   }
 };
@@ -103,6 +107,18 @@ watch(
     fetchProductos();
   },
   { deep: true }
+);
+
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath === "/") {
+      currentPage.value = 1;
+      hasMore.value = true;
+      fetchProductos(1);
+    }
+  },
+  { immediate: true }
 );
 
 onMounted(() => {
@@ -119,7 +135,9 @@ onUnmounted(() => {
   <div class="products-container max-w-7xl mx-auto">
     <!-- Loading state -->
     <div v-if="loading" class="loading">
-      <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto"></div>
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto"
+      ></div>
       <p class="mt-4 text-gray-600">Cargando productos...</p>
     </div>
 
@@ -147,7 +165,9 @@ onUnmounted(() => {
 
       <!-- Loading more indicator -->
       <div v-if="loadingMore" class="loading-more">
-        <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mx-auto"></div>
+        <div
+          class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mx-auto"
+        ></div>
         <p class="mt-2 text-gray-600">Cargando más productos...</p>
       </div>
     </div>
