@@ -15,14 +15,13 @@ import { ArrowRightIcon } from '@heroicons/vue/24/outline';
             <h3 class="text-xl font-semibold mb-4 text-green-600">
               ¿Ya eres dueño de una tienda y necesitas administrarla?
             </h3>
-            <a 
-              href="https://api.e-comcuba.com/admin" 
-              target="_blank"
+            <router-link 
+              to="/admin/dashboard"
               class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               Ir al Panel Admin
               <ArrowRightIcon class="h-5 w-5" />
-            </a>
+            </router-link>
           </div>
 
           <div class="text-center">
