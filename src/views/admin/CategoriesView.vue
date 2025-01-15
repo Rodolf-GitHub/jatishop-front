@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="mb-8 flex justify-between items-center">
+    <div class="mb-8 flex flex-col md:flex-row justify-between md:items-center gap-4 md:gap-0">
       <div>
-        <h1 class="text-2xl font-bold text-white mb-2">Categorías</h1>
-        <p class="text-gray-400">Gestiona las categorías y subcategorías de tu tienda</p>
+        <h1 class="text-xl md:text-2xl font-bold text-white mb-2">Categorías</h1>
+        <p class="text-sm md:text-base text-gray-400">Gestiona las categorías y subcategorías de tu tienda</p>
       </div>
       <button 
         @click="showAddModal = true"
-        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+        class="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center md:justify-start gap-2"
       >
         <i class="fas fa-plus"></i>
         Nueva Categoría
@@ -15,81 +15,80 @@
     </div>
 
     <!-- Lista de Categorías -->
-    <div class="grid gap-6">
+    <div class="grid gap-4 md:gap-6">
       <div 
         v-for="category in categories" 
         :key="category.id" 
         class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden"
       >
         <!-- Cabecera de Categoría -->
-        <div class="p-6 flex items-center justify-between border-b border-gray-700">
+        <div class="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0">
           <div class="flex items-center gap-4">
             <div 
-              class="w-12 h-12 rounded-lg bg-gray-700 flex items-center justify-center"
+              class="w-10 h-10 rounded-lg flex items-center justify-center"
               :style="{ backgroundColor: category.color + '20' }"
             >
-              <i :class="category.icon" :style="{ color: category.color }"></i>
+              <component 
+                :is="getIconComponent(category.icon)" 
+                class="w-6 h-6"
+                :style="{ color: category.color }"
+              />
             </div>
             <div>
-              <h3 class="text-lg font-semibold text-white">{{ category.name }}</h3>
+              <h3 class="font-medium text-white">{{ category.name }}</h3>
               <p class="text-sm text-gray-400">{{ category.subcategories.length }} subcategorías</p>
             </div>
           </div>
           
-          <div class="flex items-center gap-3">
+          <div class="flex items-center justify-end gap-3">
+            <button 
+              @click="addSubcategory(category.id)"
+              class="text-gray-400 hover:text-white"
+              title="Añadir subcategoría"
+            >
+              <PlusCircleIcon class="w-5 h-5" />
+            </button>
             <button 
               @click="editCategory(category)"
-              class="p-2 text-gray-400 hover:text-white"
+              class="text-gray-400 hover:text-white"
+              title="Editar categoría"
             >
-              <i class="fas fa-edit"></i>
+              <PencilSquareIcon class="w-5 h-5" />
             </button>
             <button 
               @click="deleteCategory(category.id)"
-              class="p-2 text-gray-400 hover:text-red-500"
+              class="text-gray-400 hover:text-red-500"
+              title="Eliminar categoría"
             >
-              <i class="fas fa-trash"></i>
+              <TrashIcon class="w-5 h-5" />
             </button>
             <button 
               @click="category.isExpanded = !category.isExpanded"
-              class="p-2 text-gray-400 hover:text-white"
+              class="text-gray-400 hover:text-white"
             >
-              <i :class="category.isExpanded ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+              <ChevronDownIcon 
+                class="w-5 h-5 transition-transform duration-200"
+                :class="{ 'rotate-180': category.isExpanded }"
+              />
             </button>
           </div>
         </div>
 
         <!-- Subcategorías -->
-        <div v-show="category.isExpanded" class="p-6 bg-gray-850">
-          <div class="flex justify-between items-center mb-4">
-            <h4 class="text-sm font-medium text-gray-400">Subcategorías</h4>
-            <button 
-              @click="addSubcategory(category.id)"
-              class="text-sm text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
-            >
-              <i class="fas fa-plus"></i>
-              Añadir Subcategoría
-            </button>
-          </div>
-
-          <div class="space-y-3">
+        <div v-show="category.isExpanded" class="p-4 md:p-6 bg-gray-750">
+          <div class="space-y-2">
             <div 
               v-for="subcategory in category.subcategories" 
               :key="subcategory.id"
-              class="flex items-center justify-between p-4 bg-gray-700 rounded-lg"
+              class="flex items-center justify-between p-3 rounded-lg bg-gray-800 hover:bg-gray-700"
             >
-              <span class="text-gray-200">{{ subcategory.name }}</span>
-              <div class="flex items-center gap-2">
-                <button 
-                  @click="editSubcategory(subcategory)"
-                  class="p-1.5 text-gray-400 hover:text-white"
-                >
-                  <i class="fas fa-edit"></i>
+              <span class="text-gray-300">{{ subcategory.name }}</span>
+              <div class="flex gap-2">
+                <button class="text-gray-400 hover:text-white">
+                  <PencilSquareIcon class="w-4 h-4" />
                 </button>
-                <button 
-                  @click="deleteSubcategory(category.id, subcategory.id)"
-                  class="p-1.5 text-gray-400 hover:text-red-500"
-                >
-                  <i class="fas fa-trash"></i>
+                <button class="text-gray-400 hover:text-red-500">
+                  <TrashIcon class="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -162,6 +161,15 @@
 
 <script setup>
 import { ref } from 'vue';
+import { 
+  PlusCircleIcon, 
+  PencilSquareIcon, 
+  TrashIcon, 
+  ChevronDownIcon,
+  ComputerDesktopIcon,
+  UsersIcon,
+  Square2StackIcon,
+} from '@heroicons/vue/24/outline';
 
 const showAddModal = ref(false);
 const editingCategory = ref(null);
@@ -172,11 +180,22 @@ const categoryForm = ref({
   color: '#6366f1'
 });
 
+// Mapa de iconos actualizado
+const iconComponents = {
+  'computer': ComputerDesktopIcon,
+  'shirt': UsersIcon,
+  'default': Square2StackIcon
+};
+
+const getIconComponent = (iconName) => {
+  return iconComponents[iconName] || iconComponents.default;
+};
+
 const categories = ref([
   {
     id: 1,
     name: 'Electrónicos',
-    icon: 'fas fa-laptop',
+    icon: 'computer',
     color: '#6366f1',
     isExpanded: true,
     subcategories: [
@@ -188,7 +207,7 @@ const categories = ref([
   {
     id: 2,
     name: 'Ropa',
-    icon: 'fas fa-tshirt',
+    icon: 'shirt',
     color: '#ec4899',
     isExpanded: false,
     subcategories: [

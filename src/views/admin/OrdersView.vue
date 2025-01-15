@@ -1,23 +1,24 @@
 <template>
   <div>
-    <div class="mb-8 flex justify-between items-center">
+    <div class="mb-8 flex flex-col md:flex-row justify-between md:items-center gap-4 md:gap-0">
       <div>
-        <h1 class="text-2xl font-bold text-white mb-2">Pedidos</h1>
-        <p class="text-gray-400">Gestiona los pedidos de tu tienda</p>
+        <h1 class="text-xl md:text-2xl font-bold text-white mb-2">Pedidos</h1>
+        <p class="text-sm md:text-base text-gray-400">Gestiona los pedidos de tu tienda</p>
       </div>
       
       <!-- Stats Cards -->
-      <div class="flex gap-4">
-        <div v-for="stat in orderStats" :key="stat.label" class="px-4 py-2 bg-gray-800 rounded-lg border border-gray-700">
-          <div class="text-sm text-gray-400">{{ stat.label }}</div>
-          <div class="text-xl font-bold" :class="stat.color">{{ stat.value }}</div>
+      <div class="grid grid-cols-2 md:flex gap-2 md:gap-4">
+        <div v-for="stat in orderStats" :key="stat.label" 
+             class="px-3 md:px-4 py-2 bg-gray-800 rounded-lg border border-gray-700">
+          <div class="text-xs md:text-sm text-gray-400">{{ stat.label }}</div>
+          <div class="text-lg md:text-xl font-bold" :class="stat.color">{{ stat.value }}</div>
         </div>
       </div>
     </div>
 
     <!-- Filtros -->
     <div class="bg-gray-800 rounded-xl p-4 mb-6 border border-gray-700">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <input 
             v-model="filters.search"
@@ -67,7 +68,7 @@
     <!-- Tabla de Pedidos -->
     <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full">
+        <table class="w-full min-w-[800px]">
           <thead>
             <tr class="bg-gray-750">
               <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Pedido</th>

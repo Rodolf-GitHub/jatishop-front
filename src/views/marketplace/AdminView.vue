@@ -16,7 +16,7 @@ import { ArrowRightIcon } from '@heroicons/vue/24/outline';
               ¿Ya eres dueño de una tienda y necesitas administrarla?
             </h3>
             <router-link 
-              to="/admin/dashboard"
+              to="/login"
               class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               Ir al Panel Admin

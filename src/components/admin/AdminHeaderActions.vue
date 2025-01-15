@@ -1,22 +1,49 @@
 <template>
-  <div class="flex items-center gap-6">
+  <div class="flex items-center gap-4 md:gap-6">
     <!-- Notifications -->
     <button class="relative text-gray-300 hover:text-white">
-      <i class="fas fa-bell text-xl"></i>
+      <BellIcon class="w-6 h-6" />
       <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
         3
       </span>
     </button>
 
     <!-- User Menu -->
-    <div class="flex items-center gap-3 cursor-pointer">
+    <div class="flex items-center gap-2 md:gap-3 cursor-pointer group relative">
       <img 
         src="../../assets/logo.svg" 
         alt="Usuario" 
-        class="w-9 h-9 rounded-full border-2 border-gray-600"
+        class="w-8 h-8 md:w-9 md:h-9 rounded-full border-2 border-gray-600"
       >
-      <span class="text-gray-200">Admin</span>
-      <i class="fas fa-chevron-down text-gray-400 text-sm"></i>
+      <span class="hidden md:block text-gray-200">Admin</span>
+      <ChevronDownIcon class="w-4 h-4 text-gray-400" />
+
+      <!-- Dropdown Menu -->
+      <div class="absolute right-0 top-full mt-2 w-48 py-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 hidden group-hover:block">
+        <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-700">
+          <UserIcon class="w-5 h-5" />
+          <span>Mi Perfil</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-700">
+          <Cog6ToothIcon class="w-5 h-5" />
+          <span>Configuración</span>
+        </a>
+        <hr class="my-2 border-gray-700" />
+        <a href="#" class="flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-gray-700">
+          <ArrowRightOnRectangleIcon class="w-5 h-5" />
+          <span>Cerrar Sesión</span>
+        </a>
+      </div>
     </div>
   </div>
-</template> 
+</template>
+
+<script setup>
+import { 
+  BellIcon, 
+  ChevronDownIcon,
+  UserIcon,
+  Cog6ToothIcon,
+  ArrowRightOnRectangleIcon 
+} from '@heroicons/vue/24/outline';
+</script> 

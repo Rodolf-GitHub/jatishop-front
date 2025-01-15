@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="mb-8 flex justify-between items-center">
+    <div class="mb-8 flex flex-col md:flex-row justify-between md:items-center gap-4 md:gap-0">
       <div>
-        <h1 class="text-2xl font-bold text-white mb-2">Productos</h1>
-        <p class="text-gray-400">Gestiona el catálogo de productos de tu tienda</p>
+        <h1 class="text-xl md:text-2xl font-bold text-white mb-2">Productos</h1>
+        <p class="text-sm md:text-base text-gray-400">Gestiona el catálogo de productos de tu tienda</p>
       </div>
       <button 
         @click="showAddModal = true"
-        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2"
+        class="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center md:justify-start gap-2"
       >
         <i class="fas fa-plus"></i>
         Nuevo Producto
@@ -16,7 +16,7 @@
 
     <!-- Filtros -->
     <div class="bg-gray-800 rounded-xl p-4 mb-6 border border-gray-700">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <input 
             v-model="filters.search"
@@ -64,7 +64,7 @@
     <!-- Tabla de Productos -->
     <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full">
+        <table class="w-full min-w-[800px]">
           <thead>
             <tr class="bg-gray-750">
               <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Producto</th>
