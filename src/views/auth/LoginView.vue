@@ -45,7 +45,7 @@
                 </label>
                 <input
                   v-model="loginForm.email"
-                  type="email"
+                  type="text"
                   required
                   class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
                   placeholder="ejemplo@correo.com"
@@ -204,7 +204,7 @@ const handleLogin = async () => {
   try {
     // Aquí iría la lógica de autenticación
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push("/admin/dashboard");
+    router.push("/admin/home");
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
   } finally {
