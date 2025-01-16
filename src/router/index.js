@@ -3,7 +3,6 @@ import StoresListView from "../views/StoresListView.vue";
 import StoreLayout from "../layouts/StoreLayout.vue";
 import StoreView from "../views/StoreView.vue";
 import MarketplaceLayout from "../layouts/MarketplaceLayout.vue";
-import AdminDashboard from "../views/admin/DashboardView.vue";
 import AdminLayout from "../views/admin/AdminView.vue";
 import DashboardView from "../views/admin/DashboardView.vue";
 import BusinessView from "../views/admin/BusinessView.vue";
@@ -12,7 +11,7 @@ import ProductsView from "../views/admin/ProductsView.vue";
 import OrdersView from "../views/admin/OrdersView.vue";
 import UsersView from "../views/admin/UsersView.vue";
 import LoginView from "@/views/auth/LoginView.vue";
-import AdminView from "@/views/admin/AdminView.vue";
+import HomeAdminView from "@/views/admin/HomeAdminView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -102,6 +101,11 @@ const router = createRouter({
           path: "business",
           name: "admin-business",
           component: BusinessView,
+        },
+        {
+          path: "home",
+          name: "admin-home",
+          component: HomeAdminView,
         },
         {
           path: "categories",

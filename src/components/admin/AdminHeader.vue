@@ -4,7 +4,7 @@
       <!-- Espacio para el botón de menú en móvil -->
       <div class="w-12 md:w-auto"></div>
       
-      <AdminSearch />
+      <!-- <AdminSearch /> -->
       <AdminHeaderActions />
     </div>
   </header>

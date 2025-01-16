@@ -25,7 +25,7 @@
             class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
           >
         </div>
-        <div>
+        <!-- <div>
           <select 
             v-model="filters.category"
             class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
@@ -35,8 +35,8 @@
               {{ cat.name }}
             </option>
           </select>
-        </div>
-        <div>
+        </div> -->
+        <!-- <div>
           <select 
             v-model="filters.status"
             class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
@@ -46,8 +46,8 @@
             <option value="inactive">Inactivo</option>
             <option value="out_of_stock">Sin Stock</option>
           </select>
-        </div>
-        <div>
+        </div> -->
+        <!-- <div>
           <select 
             v-model="filters.sort"
             class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
@@ -57,7 +57,7 @@
             <option value="price_asc">Precio: Menor a Mayor</option>
             <option value="price_desc">Precio: Mayor a Menor</option>
           </select>
-        </div>
+        </div> -->
       </div>
     </div>
 
