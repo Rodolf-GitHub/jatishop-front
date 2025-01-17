@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import {
   Bars3Icon,
@@ -13,7 +13,7 @@ import SearchBar from "../filters/SearchBar.vue";
 import SideBar from "./SideBar.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 
-const props = defineProps({
+defineProps({
   store: {
     type: Object,
     required: false,
@@ -95,6 +95,7 @@ const getTransferTitle = (acceptsTransfer) => {
     <nav class="fixed top-0 left-0 right-0 bg-gray-50 shadow-lg z-40">
       <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         <div class="flex flex-col">
+          <!-- Primera fila: Logo y E-comCuba -->
           <div class="flex flex-col md:flex-row">
             <div class="flex items-center h-14 md:h-16 w-full">
               <div class="flex items-center gap-2">
@@ -147,6 +148,7 @@ const getTransferTitle = (acceptsTransfer) => {
             </div>
           </div>
 
+          <!-- Segunda fila: Iconos de información -->
           <div v-if="store" class="flex justify-between items-center py-2">
             <div class="flex justify-between items-center w-full">
               <!-- Currency -->
@@ -222,7 +224,6 @@ const getTransferTitle = (acceptsTransfer) => {
                 <MapPinIcon
                   class="h-7 w-7 text-jati hover:text-shop transition-colors stroke-[2.5]"
                 />
-                <!-- <span class="block text-sm ml-1">Ubicación</span> -->
               </a>
 
               <a
@@ -234,15 +235,16 @@ const getTransferTitle = (acceptsTransfer) => {
                 <QuestionMarkCircleIcon
                   class="h-7 w-7 text-jati hover:text-shop transition-colors stroke-[2.5]"
                 />
-                <!-- <span class="block text-sm ml-1">Ayuda</span> -->
               </a>
-            </div>
-
-            <div v-if="showSearch" class="md:hidden flex-1 mx-4">
-              <SearchBar @filter="handleSearch" />
             </div>
           </div>
 
+          <!-- Tercera fila: SearchBar en móvil -->
+          <div v-if="store && showSearch" class="md:hidden py-2">
+            <SearchBar @filter="handleSearch" class="w-full" />
+          </div>
+
+          <!-- Cuarta fila: Breadcrumb -->
           <div v-if="store" class="pb-2 md:pb-3">
             <Breadcrumb />
           </div>
@@ -250,7 +252,7 @@ const getTransferTitle = (acceptsTransfer) => {
       </div>
     </nav>
 
-    <div :class="{ 'h-32 md:h-28': store, 'h-14 md:h-16': !store }"></div>
+    <div :class="{ 'h-44 md:h-28': store && showSearch, 'h-32 md:h-28': store && !showSearch, 'h-14 md:h-16': !store }"></div>
 
     <SideBar
       v-if="store"

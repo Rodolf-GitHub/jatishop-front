@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref, onMounted,  } from "vue";
+import {  useRoute } from "vue-router";
 import { useMarketplaceStore } from '@/stores/marketplace';
+import InfoBanner from '@/components/InfoBanner.vue';
 import {
   ShoppingBagIcon,
   BuildingStorefrontIcon,
@@ -11,7 +12,7 @@ import {
 } from "@heroicons/vue/24/outline";
 import UbicacionModal from '@/components/marketplace/UbicacionModal.vue';
 
-const router = useRouter();
+
 const route = useRoute();
 const marketplaceStore = useMarketplaceStore();
 const showUbicacionModal = ref(false);
@@ -131,6 +132,12 @@ onMounted(async () => {
 
   <!-- Ajustar el espaciador -->
   <div class="h-28 md:h-32"></div>
+
+  <!-- Agregamos el InfoBanner justo después del espaciador -->
+  <InfoBanner 
+    message="Actualización programada hoy a las 10:00 PM (hora de Cuba) para mejorar el rendimiento, solucionar errores y optimizar la experiencia de usuario. ¡Gracias por tu comprensión!"
+    type="info"
+  />
 
   <!-- Modal de ubicación -->
   <UbicacionModal 
