@@ -4,7 +4,7 @@
   >
     <div class="h-full p-6">
       <div class="flex items-center gap-3 mb-8">
-        <img src="../../assets/logo.svg" alt="Logo" class="w-10 h-10">
+        <img src="/favicon.ico" alt="Logo" class="w-12 h-12 rounded-full">
         <h2 class="text-xl font-bold text-white">Panel Admin</h2>
       </div>
       
@@ -37,16 +37,22 @@ import {
   TagIcon,
   CubeIcon,
   ShoppingCartIcon,
-  UsersIcon
+  UsersIcon,
+  HomeIcon
 } from '@heroicons/vue/24/outline';
 
 const route = useRoute();
 
 const menuItems = ref([
+  // {
+  //   name: 'Dashboard',
+  //   icon: ChartBarIcon,
+  //   route: '/admin/dashboard'
+  // },
   {
-    name: 'Dashboard',
-    icon: ChartBarIcon,
-    route: '/admin/dashboard'
+    name: 'Inicio',
+    icon: HomeIcon,
+    route: '/admin/home'
   },
   {
     name: 'Mi Negocio',
@@ -63,16 +69,16 @@ const menuItems = ref([
     icon: CubeIcon,
     route: '/admin/products'
   },
-  {
-    name: 'Pedidos',
-    icon: ShoppingCartIcon,
-    route: '/admin/orders'
-  },
-  {
-    name: 'Usuarios',
-    icon: UsersIcon,
-    route: '/admin/users'
-  }
+  // {
+  //   name: 'Pedidos',
+  //   icon: ShoppingCartIcon,
+  //   route: '/admin/orders'
+  // },
+  // {
+  //   name: 'Usuarios',
+  //   icon: UsersIcon,
+  //   route: '/admin/users'
+  // }
 ]);
 
 const isActiveRoute = (path) => {
