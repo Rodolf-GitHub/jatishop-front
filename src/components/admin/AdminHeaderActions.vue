@@ -12,7 +12,7 @@
     <div class="ml-auto flex items-center gap-2">
       <a
         href="/"
-        class="flex items-center gap-2  hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
+        class="flex items-center gap-2 hover:bg-jati/10 rounded-full transition-colors bg-white shadow-md"
       >
         <img
           src="/logo.jpg"
@@ -52,13 +52,13 @@
           <span>Configuración</span>
         </a>
         <hr class="my-2 border-gray-700" />
-        <a
-          href="#"
-          class="flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-gray-700"
+        <button
+          @click="handleLogout"
+          class="w-full flex items-center gap-3 px-4 py-2 text-red-400 hover:bg-gray-700"
         >
           <ArrowRightOnRectangleIcon class="w-5 h-5" />
           <span>Cerrar Sesión</span>
-        </a>
+        </button>
       </div>
     </div>
   </div>
@@ -72,4 +72,17 @@ import {
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/vue/24/outline";
+import { useAuth } from "@/composables/useAuth";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const { logout } = useAuth();
+
+const handleLogout = async () => {
+  try {
+    await logout();
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+  }
+};
 </script>

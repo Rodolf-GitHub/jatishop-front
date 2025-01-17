@@ -12,6 +12,8 @@ import OrdersView from "../views/admin/OrdersView.vue";
 import UsersView from "../views/admin/UsersView.vue";
 import LoginView from "@/views/auth/LoginView.vue";
 import HomeAdminView from "@/views/admin/HomeAdminView.vue";
+import NotFoundView from "@/views/NotFoundView.vue";
+import { useAuth } from "@/composables/useAuth";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -91,6 +93,7 @@ const router = createRouter({
     {
       path: "/admin",
       component: AdminLayout,
+      meta: { requiresAuth: true },
       children: [
         {
           path: "dashboard",
@@ -129,7 +132,44 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "not-found",
+      component: NotFoundView,
+    },
   ],
+});
+
+// Guard de navegación con debug
+router.beforeEach(async (to, from, next) => {
+  const { checkAuth, isAuthenticated } = useAuth();
+
+  // Verificar autenticación
+  const authResult = await checkAuth();
+
+  // Si la ruta no existe, permitir navegación a 404
+  if (to.name === "not-found") {
+    return next();
+  }
+
+  // Debug meta requiresGuest
+  if (to.meta.requiresGuest) {
+    if (isAuthenticated.value) {
+      return next({ name: "admin-home" });
+    }
+  }
+
+  // Debug meta requiresAuth
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!isAuthenticated.value) {
+      return next({
+        name: "login",
+        query: { redirect: to.fullPath },
+      });
+    }
+  }
+
+  next();
 });
 
 export default router;

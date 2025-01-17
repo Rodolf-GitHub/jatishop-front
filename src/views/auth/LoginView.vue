@@ -27,6 +27,14 @@
         </p>
       </div>
 
+      <!-- Mensaje de Error -->
+      <div
+        v-if="errorMessage"
+        class="mb-6 p-4 bg-red-500/10 border border-red-500 rounded-lg"
+      >
+        <p class="text-red-500 text-sm">{{ errorMessage }}</p>
+      </div>
+
       <!-- Card con Formularios -->
       <div
         class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden"
@@ -38,18 +46,24 @@
             :class="isLogin ? 'block' : 'hidden'"
           >
             <form @submit.prevent="handleLogin" class="p-6 md:p-8 space-y-6">
-              <!-- Email -->
+              <!-- Email/Username -->
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Correo Electrónico
+                  Nombre de usuario
                 </label>
                 <input
                   v-model="loginForm.email"
                   type="text"
-                  required
+                  :class="{ 'border-red-500': v$.loginForm.email.$error }"
                   class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="ejemplo@correo.com"
+                  placeholder="usuario"
                 />
+                <span
+                  v-if="v$.loginForm.email.$error"
+                  class="text-red-500 text-xs mt-1"
+                >
+                  {{ v$.loginForm.email.$errors[0].$message }}
+                </span>
               </div>
 
               <!-- Contraseña -->
@@ -60,16 +74,22 @@
                 <input
                   v-model="loginForm.password"
                   type="password"
-                  required
+                  :class="{ 'border-red-500': v$.loginForm.password.$error }"
                   class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
                   placeholder="••••••••"
                 />
+                <span
+                  v-if="v$.loginForm.password.$error"
+                  class="text-red-500 text-xs mt-1"
+                >
+                  {{ v$.loginForm.password.$errors[0].$message }}
+                </span>
               </div>
 
               <!-- Botón de Login -->
               <button
                 type="submit"
-                class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2"
+                class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 :disabled="loading"
               >
                 <span
@@ -90,14 +110,42 @@
               <!-- Nombre -->
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Nombre Completo
+                  Nombre
                 </label>
                 <input
-                  v-model="registerForm.name"
+                  v-model="registerForm.firstName"
                   type="text"
                   required
                   class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="Juan Pérez"
+                  placeholder="Juan"
+                />
+              </div>
+
+              <!-- Apellido -->
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  Apellidos
+                </label>
+                <input
+                  v-model="registerForm.lastName"
+                  type="text"
+                  required
+                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
+                  placeholder="Pérez González"
+                />
+              </div>
+
+              <!-- Username -->
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  Nombre de usuario
+                </label>
+                <input
+                  v-model="registerForm.username"
+                  type="text"
+                  required
+                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
+                  placeholder="usuario123"
                 />
               </div>
 
@@ -178,50 +226,101 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { ArrowLeftIcon } from "@heroicons/vue/24/outline";
+import { useAuth } from "@/composables/useAuth";
+import { useVuelidate } from "@vuelidate/core";
+import { required, minLength, helpers } from "@vuelidate/validators";
 
 const router = useRouter();
-const loading = ref(false);
+const { login, register, loading, error } = useAuth();
 const isLogin = ref(true);
+const errorMessage = ref("");
 
 const loginForm = ref({
   email: "",
   password: "",
-  remember: false,
 });
 
 const registerForm = ref({
-  name: "",
+  username: "",
+  firstName: "",
+  lastName: "",
   email: "",
   password: "",
   confirmPassword: "",
 });
 
+// Reglas de validación con mensajes personalizados
+const rules = {
+  loginForm: {
+    email: {
+      required: helpers.withMessage(
+        "El nombre de usuario es requerido",
+        required
+      ),
+      minLength: helpers.withMessage(
+        "El nombre de usuario debe tener al menos 3 caracteres",
+        minLength(3)
+      ),
+    },
+    password: {
+      required: helpers.withMessage("La contraseña es requerida", required),
+      minLength: helpers.withMessage(
+        "La contraseña debe tener al menos 6 caracteres",
+        minLength(6)
+      ),
+    },
+  },
+};
+
+const v$ = useVuelidate(rules, { loginForm });
+
 const handleLogin = async () => {
-  loading.value = true;
+  errorMessage.value = "";
+
+  // Validar el formulario
+  const isFormValid = await v$.value.$validate();
+  if (!isFormValid) return;
+
   try {
-    // Aquí iría la lógica de autenticación
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push("/admin/home");
-  } catch (error) {
-    console.error("Error al iniciar sesión:", error);
-  } finally {
-    loading.value = false;
+    await login({
+      username: loginForm.value.email,
+      password: loginForm.value.password,
+    });
+  } catch (err) {
+    // Manejar diferentes tipos de errores
+    if (err?.status === 400) {
+      errorMessage.value =
+        "Credenciales inválidas. Por favor, verifica tu usuario y contraseña.";
+    } else if (err?.status === 401) {
+      errorMessage.value =
+        "No autorizado. Por favor, inicia sesión nuevamente.";
+    } else {
+      errorMessage.value =
+        "Ha ocurrido un error. Por favor, intenta nuevamente más tarde.";
+    }
+    console.error(err);
   }
 };
 
 const handleRegister = async () => {
-  loading.value = true;
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    alert("Las contraseñas no coinciden");
+    return;
+  }
+
   try {
-    // Aquí iría la lógica de registro
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    isLogin.value = true;
-  } catch (error) {
-    console.error("Error al registrar:", error);
-  } finally {
-    loading.value = false;
+    await register({
+      username: registerForm.value.username,
+      first_name: registerForm.value.firstName,
+      last_name: registerForm.value.lastName,
+      email: registerForm.value.email,
+      password: registerForm.value.password,
+    });
+  } catch (err) {
+    console.error(err);
   }
 };
 
