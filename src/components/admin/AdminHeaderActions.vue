@@ -30,7 +30,7 @@
         alt="Usuario"
         class="w-10 h-10 rounded-full border-2 border-gray-600"
       />
-      <span class="hidden md:block text-gray-200">Admin</span>
+      <span class="hidden md:block text-gray-200">{{ username }}</span>
       <ChevronDownIcon class="w-4 h-4 text-gray-400" />
 
       <!-- Dropdown Menu -->
@@ -74,13 +74,20 @@ import {
 } from "@heroicons/vue/24/outline";
 import { useAuth } from "@/composables/useAuth";
 import { useRouter } from "vue-router";
+import { ref, onMounted } from 'vue';
 
 const router = useRouter();
 const { logout } = useAuth();
+const username = ref('');
+
+onMounted(() => {
+  username.value = window.localStorage.getItem('admin_username') || '';
+});
 
 const handleLogout = async () => {
   try {
     await logout();
+    router.push('/login');
   } catch (error) {
     console.error("Error al cerrar sesión:", error);
   }

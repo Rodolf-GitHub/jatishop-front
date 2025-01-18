@@ -24,18 +24,15 @@
         <!-- Cabecera de Categoría -->
         <div class="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0">
           <div class="flex items-center gap-4">
-            <div 
-              class="w-10 h-10 rounded-lg flex items-center justify-center"
-              :style="{ backgroundColor: category.color + '20' }"
-            >
-              <component 
-                :is="getIconComponent(category.icon)" 
-                class="w-6 h-6"
-                :style="{ color: category.color }"
-              />
-            </div>
+            <img 
+              v-if="category.imagen" 
+              :src="category.imagen" 
+              class="w-10 h-10 rounded-lg object-cover"
+              alt="Categoría"
+            />
             <div>
-              <h3 class="font-medium text-white">{{ category.name }}</h3>
+              <h3 class="font-medium text-white">{{ category.nombre }}</h3>
+              <p v-if="category.descripcion" class="text-sm text-gray-400">{{ category.descripcion }}</p>
               <p class="text-sm text-gray-400">{{ category.subcategories.length }} subcategorías</p>
             </div>
           </div>
@@ -110,38 +107,29 @@
               Nombre
             </label>
             <input 
-              v-model="categoryForm.name"
+              v-model="categoryForm.nombre"
               type="text"
+              required
               class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
             >
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">
-              Ícono
+              Imagen
             </label>
             <input 
-              v-model="categoryForm.icon"
-              type="text"
+              type="file"
+              @change="handleImageUpload"
+              accept="image/*"
               class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-            >
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              Color
-            </label>
-            <input 
-              v-model="categoryForm.color"
-              type="color"
-              class="w-full h-10 px-2 bg-gray-700 border border-gray-600 rounded-lg"
             >
           </div>
 
           <div class="flex justify-end gap-4 mt-6">
             <button 
               type="button"
-              @click="showAddModal = false"
+              @click="closeModal"
               class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
             >
               Cancelar
@@ -160,7 +148,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useToast } from 'vue-toastification';
+import { adminServices } from '@/services/admin';
 import { 
   PlusCircleIcon, 
   PencilSquareIcon, 
@@ -171,81 +161,107 @@ import {
   Square2StackIcon,
 } from '@heroicons/vue/24/outline';
 
+const toast = useToast();
 const showAddModal = ref(false);
 const editingCategory = ref(null);
+const categories = ref([]);
 
 const categoryForm = ref({
-  name: '',
-  icon: '',
-  color: '#6366f1'
+  nombre: '',
+  imagen: null
 });
 
-// Mapa de iconos actualizado
-const iconComponents = {
-  'computer': ComputerDesktopIcon,
-  'shirt': UsersIcon,
-  'default': Square2StackIcon
-};
-
-const getIconComponent = (iconName) => {
-  return iconComponents[iconName] || iconComponents.default;
-};
-
-const categories = ref([
-  {
-    id: 1,
-    name: 'Electrónicos',
-    icon: 'computer',
-    color: '#6366f1',
-    isExpanded: true,
-    subcategories: [
-      { id: 1, name: 'Laptops' },
-      { id: 2, name: 'Smartphones' },
-      { id: 3, name: 'Tablets' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Ropa',
-    icon: 'shirt',
-    color: '#ec4899',
-    isExpanded: false,
-    subcategories: [
-      { id: 4, name: 'Camisetas' },
-      { id: 5, name: 'Pantalones' },
-      { id: 6, name: 'Vestidos' }
-    ]
+// Cargar categorías al montar el componente
+const loadCategories = async () => {
+  try {
+    const response = await adminServices.getMyCategories();
+    categories.value = response.data.map(cat => ({
+      ...cat,
+      isExpanded: false
+    }));
+  } catch (error) {
+    toast.error('Error al cargar las categorías');
+    console.error('Error:', error);
   }
-]);
-
-const saveCategory = () => {
-  // Aquí iría la lógica para guardar la categoría
-  showAddModal.value = false;
 };
 
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    categoryForm.value.imagen = file;
+  }
+};
+
+const closeModal = () => {
+  showAddModal.value = false;
+  editingCategory.value = null;
+  categoryForm.value = {
+    nombre: '',
+    imagen: null
+  };
+};
+
+const saveCategory = async () => {
+  try {
+    const formData = new FormData();
+    formData.append('nombre', categoryForm.value.nombre);
+    if (categoryForm.value.imagen) {
+      formData.append('imagen', categoryForm.value.imagen);
+    }
+
+    if (editingCategory.value) {
+      await adminServices.updateCategory(editingCategory.value.id, formData);
+      toast.success('Categoría actualizada correctamente');
+    } else {
+      await adminServices.createCategory(formData);
+      toast.success('Categoría creada correctamente');
+    }
+    closeModal();
+    loadCategories();
+  } catch (error) {
+    toast.error('Error al guardar la categoría');
+    console.error('Error:', error);
+  }
+};
+
+// Eliminar categoría
+const deleteCategory = async (categoryId) => {
+  if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+    try {
+      await adminServices.deleteCategory(categoryId);
+      toast.success('Categoría eliminada correctamente');
+      loadCategories();
+    } catch (error) {
+      toast.error('Error al eliminar la categoría');
+      console.error('Error:', error);
+    }
+  }
+};
+
+// Editar categoría
 const editCategory = (category) => {
   editingCategory.value = category;
-  categoryForm.value = { ...category };
+  categoryForm.value = {
+    nombre: category.nombre,
+    imagen: null // La imagen existente se mantiene en el backend si no se sube una nueva
+  };
   showAddModal.value = true;
 };
 
-const deleteCategory = (categoryId) => {
-  if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
-    // Aquí iría la lógica para eliminar la categoría
-  }
+// Gestión de subcategorías
+const addSubcategory = async (categoryId) => {
+  // Implementar lógica para añadir subcategoría
 };
 
-const addSubcategory = (categoryId) => {
-  // Aquí iría la lógica para añadir subcategoría
+const editSubcategory = async (categoryId, subcategory) => {
+  // Implementar lógica para editar subcategoría
 };
 
-const editSubcategory = (subcategory) => {
-  // Aquí iría la lógica para editar subcategoría
+const deleteSubcategory = async (categoryId, subcategoryId) => {
+  // Implementar lógica para eliminar subcategoría
 };
 
-const deleteSubcategory = (categoryId, subcategoryId) => {
-  if (confirm('¿Estás seguro de que deseas eliminar esta subcategoría?')) {
-    // Aquí iría la lógica para eliminar la subcategoría
-  }
-};
+onMounted(() => {
+  loadCategories();
+});
 </script> 

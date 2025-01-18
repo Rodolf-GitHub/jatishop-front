@@ -21,9 +21,7 @@ const filteredProducts = computed(() => {
   );
 });
 
-const handleSearch = (query) => {
-  searchQuery.value = query;
-};
+
 
 const fetchProductos = async () => {
   try {

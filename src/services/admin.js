@@ -30,6 +30,7 @@ export const adminServices = {
     // Guardar datos del usuario en localStorage
     if (response.data) {
       localStorage.setItem("admin_token", response.data.token);
+      localStorage.setItem("admin_username", response.data.username);
       localStorage.setItem(
         "admin_user",
         JSON.stringify({
@@ -193,6 +194,48 @@ export const adminServices = {
   },
 
   register: (userData) => adminApi.post("/auth/register/", userData),
+
+  // Categorías
+  getMyCategories() {
+    return adminApi.get('/mi-negocio/categorias/my_categories/');
+  },
+
+  createCategory(formData) {
+    return adminApi.post('/mi-negocio/categorias/my_categories/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+
+  updateCategory(id, formData) {
+    return adminApi.put(`/mi-negocio/categorias/${id}/manage_category/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+
+  deleteCategory(id) {
+    return adminApi.delete(`/mi-negocio/categorias/${id}/manage_category/`);
+  },
+
+  // Subcategorías
+  getCategorySubcategories(categoryId) {
+    return adminApi.get(`/mi-negocio/categorias/${categoryId}/subcategories/`);
+  },
+
+  createSubcategory(categoryId, data) {
+    return adminApi.post(`/mi-negocio/categorias/${categoryId}/subcategories/`, data);
+  },
+
+  updateSubcategory(categoryId, subcategoryId, data) {
+    return adminApi.put(`/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`, data);
+  },
+
+  deleteSubcategory(categoryId, subcategoryId) {
+    return adminApi.delete(`/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`);
+  }
 };
 
 // Interceptor para manejar errores de autenticación

@@ -286,6 +286,8 @@
           <option value="CUP">CUP - Peso Cubano</option>
           <option value="USD">USD - Dólar Americano</option>
           <option value="EUR">EUR - Euro</option>
+          <option value="ZELLE">ZELLE</option>
+          <option value="MLC">MLC</option>
         </select>
       </div>
 
@@ -325,7 +327,7 @@
         <button
           type="button"
           class="px-6 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
-          @click="resetForm"
+          @click="window.location.reload()"
         >
           Cancelar
         </button>
