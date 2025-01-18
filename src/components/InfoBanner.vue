@@ -35,7 +35,7 @@ const props = defineProps({
   }
 })
 
-const visible = ref(true)
+const visible = ref(false)
 
 const icons = {
   info: 'fas fa-info-circle',

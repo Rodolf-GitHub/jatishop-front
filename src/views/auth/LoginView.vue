@@ -1,28 +1,18 @@
 <template>
-  <div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+  <div
+    class="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center p-4"
+  >
     <div class="max-w-md w-full">
-      <!-- Botón Regresar -->
-      <router-link
-        to="/"
-        class="inline-flex items-center text-gray-400 hover:text-white mb-8 transition-colors"
-      >
-        <ArrowLeftIcon class="w-5 h-5 mr-2" />
-        Regresar
-      </router-link>
-
       <!-- Logo y Título -->
       <div class="text-center mb-8">
-        <img
-          src="@/assets/logo.svg"
-          alt="Logo"
-          class="w-16 h-16 mx-auto mb-4"
-        />
-        <h2 class="text-2xl font-bold text-white">Panel de Administración</h2>
-        <p class="text-gray-400 mt-2">
+        <h2 class="text-3xl font-bold text-gray-900">
+          {{ isLogin ? "¡Bienvenido de nuevo!" : "Crea tu tienda" }}
+        </h2>
+        <p class="text-gray-600 mt-2">
           {{
             isLogin
-              ? "Inicia sesión para acceder al panel"
-              : "Crea tu cuenta de administrador"
+              ? "Accede a tu panel de administración"
+              : "Comienza a vender en línea hoy mismo"
           }}
         </p>
       </div>
@@ -30,210 +20,205 @@
       <!-- Mensaje de Error -->
       <div
         v-if="errorMessage"
-        class="mb-6 p-4 bg-red-500/10 border border-red-500 rounded-lg"
+        class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl"
       >
-        <p class="text-red-500 text-sm">{{ errorMessage }}</p>
+        <p class="text-red-600 text-sm">{{ errorMessage }}</p>
       </div>
 
       <!-- Card con Formularios -->
       <div
-        class="bg-gray-800 rounded-xl shadow-lg border border-gray-700 overflow-hidden"
+        class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
       >
-        <div class="relative w-full">
-          <!-- Formulario de Login -->
-          <div
-            class="w-full transition-all duration-300 ease-in-out"
-            :class="isLogin ? 'block' : 'hidden'"
+        <!-- Tabs de Login/Register -->
+        <div class="flex border-b border-gray-200">
+          <button
+            @click="isLogin = true"
+            class="flex-1 py-4 text-sm font-medium transition-colors"
+            :class="
+              isLogin
+                ? 'text-indigo-600 border-b-2 border-indigo-600'
+                : 'text-gray-500 hover:text-gray-700'
+            "
           >
-            <form @submit.prevent="handleLogin" class="p-6 md:p-8 space-y-6">
-              <!-- Email/Username -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Nombre de usuario
-                </label>
-                <input
-                  v-model="loginForm.email"
-                  type="text"
-                  :class="{ 'border-red-500': v$.loginForm.email.$error }"
-                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="usuario"
-                />
-                <span
-                  v-if="v$.loginForm.email.$error"
-                  class="text-red-500 text-xs mt-1"
-                >
-                  {{ v$.loginForm.email.$errors[0].$message }}
-                </span>
-              </div>
+            Iniciar Sesión
+          </button>
+          <button
+            @click="isLogin = false"
+            class="flex-1 py-4 text-sm font-medium transition-colors"
+            :class="
+              !isLogin
+                ? 'text-indigo-600 border-b-2 border-indigo-600'
+                : 'text-gray-500 hover:text-gray-700'
+            "
+          >
+            Crear Cuenta
+          </button>
+        </div>
 
-              <!-- Contraseña -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Contraseña
-                </label>
-                <input
-                  v-model="loginForm.password"
-                  type="password"
-                  :class="{ 'border-red-500': v$.loginForm.password.$error }"
-                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="••••••••"
-                />
-                <span
-                  v-if="v$.loginForm.password.$error"
-                  class="text-red-500 text-xs mt-1"
-                >
-                  {{ v$.loginForm.password.$errors[0].$message }}
-                </span>
-              </div>
-
-              <!-- Botón de Login -->
-              <button
-                type="submit"
-                class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                :disabled="loading"
+        <div class="p-6 md:p-8">
+          <!-- Formulario de Login -->
+          <form v-if="isLogin" @submit.prevent="handleLogin" class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Nombre de usuario
+              </label>
+              <input
+                v-model="loginForm.email"
+                type="text"
+                :class="{ 'border-red-300': v$.loginForm.email.$error }"
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                placeholder="usuario"
+              />
+              <span
+                v-if="v$.loginForm.email.$error"
+                class="text-red-500 text-xs mt-1"
               >
-                <span
-                  v-if="loading"
-                  class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
-                ></span>
-                {{ loading ? "Iniciando sesión..." : "Iniciar Sesión" }}
-              </button>
-            </form>
-          </div>
+                {{ v$.loginForm.email.$errors[0].$message }}
+              </span>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Contraseña
+              </label>
+              <input
+                v-model="loginForm.password"
+                type="password"
+                :class="{ 'border-red-300': v$.loginForm.password.$error }"
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                placeholder="••••••••"
+              />
+              <span
+                v-if="v$.loginForm.password.$error"
+                class="text-red-500 text-xs mt-1"
+              >
+                {{ v$.loginForm.password.$errors[0].$message }}
+              </span>
+            </div>
+
+            <button
+              type="submit"
+              class="w-full px-4 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              :disabled="loading"
+            >
+              <span
+                v-if="loading"
+                class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></span>
+              {{ loading ? "Iniciando sesión..." : "Iniciar Sesión" }}
+            </button>
+          </form>
 
           <!-- Formulario de Registro -->
-          <div
-            class="w-full transition-all duration-300 ease-in-out"
-            :class="!isLogin ? 'block' : 'hidden'"
-          >
-            <form @submit.prevent="handleRegister" class="p-6 md:p-8 space-y-6">
-              <!-- Nombre -->
+          <form v-else @submit.prevent="handleRegister" class="space-y-5">
+            <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
                   Nombre
                 </label>
                 <input
                   v-model="registerForm.firstName"
                   type="text"
                   required
-                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
+                  class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                   placeholder="Juan"
                 />
               </div>
 
-              <!-- Apellido -->
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
                   Apellidos
                 </label>
                 <input
                   v-model="registerForm.lastName"
                   type="text"
                   required
-                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="Pérez González"
+                  class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  placeholder="Pérez"
                 />
               </div>
+            </div>
 
-              <!-- Username -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Nombre de usuario
-                </label>
-                <input
-                  v-model="registerForm.username"
-                  type="text"
-                  required
-                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="usuario123"
-                />
-              </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Nombre de usuario
+              </label>
+              <input
+                v-model="registerForm.username"
+                type="text"
+                required
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                placeholder="usuario123"
+              />
+            </div>
 
-              <!-- Email -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Correo Electrónico
-                </label>
-                <input
-                  v-model="registerForm.email"
-                  type="email"
-                  required
-                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="ejemplo@correo.com"
-                />
-              </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Correo Electrónico
+              </label>
+              <input
+                v-model="registerForm.email"
+                type="email"
+                required
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                placeholder="ejemplo@correo.com"
+              />
+            </div>
 
-              <!-- Contraseña -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Contraseña
-                </label>
-                <input
-                  v-model="registerForm.password"
-                  type="password"
-                  required
-                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="••••••••"
-                />
-              </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Contraseña
+              </label>
+              <input
+                v-model="registerForm.password"
+                type="password"
+                required
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                placeholder="••••••••"
+              />
+            </div>
 
-              <!-- Confirmar Contraseña -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Confirmar Contraseña
-                </label>
-                <input
-                  v-model="registerForm.confirmPassword"
-                  type="password"
-                  required
-                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-                  placeholder="••••••••"
-                />
-              </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Confirmar Contraseña
+              </label>
+              <input
+                v-model="registerForm.confirmPassword"
+                type="password"
+                required
+                class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                placeholder="••••••••"
+              />
+            </div>
 
-              <!-- Botón de Registro -->
-              <button
-                type="submit"
-                class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2"
-                :disabled="loading"
-              >
-                <span
-                  v-if="loading"
-                  class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
-                ></span>
-                {{ loading ? "Creando cuenta..." : "Crear Cuenta" }}
-              </button>
-            </form>
-          </div>
+            <button
+              type="submit"
+              class="w-full px-4 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              :disabled="loading"
+            >
+              <span
+                v-if="loading"
+                class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+              ></span>
+              {{ loading ? "Creando cuenta..." : "Crear Cuenta" }}
+            </button>
+          </form>
         </div>
-      </div>
-
-      <!-- Toggle Login/Register -->
-      <div class="text-center mt-6">
-        <button
-          @click="toggleForm"
-          class="text-indigo-400 hover:text-indigo-300 text-sm transition-colors"
-        >
-          {{
-            isLogin
-              ? "¿No tienes cuenta? Créala aquí"
-              : "¿Ya tienes cuenta? Inicia sesión"
-          }}
-        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { ArrowLeftIcon } from "@heroicons/vue/24/outline";
 import { useAuth } from "@/composables/useAuth";
 import { useVuelidate } from "@vuelidate/core";
 import { required, minLength, helpers } from "@vuelidate/validators";
 
 const router = useRouter();
+const route = useRoute();
 const { login, register, loading, error } = useAuth();
 const isLogin = ref(true);
 const errorMessage = ref("");
@@ -348,6 +333,13 @@ const handleRegister = async () => {
 const toggleForm = () => {
   isLogin.value = !isLogin.value;
 };
+
+onMounted(() => {
+  // Si viene el parámetro register=true, mostrar el formulario de registro
+  if (route.query.register === "true") {
+    isLogin.value = false;
+  }
+});
 </script>
 
 <style scoped>

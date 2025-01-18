@@ -197,6 +197,45 @@
             </option>
           </select>
         </div>
+
+        <!-- Nuevos campos de Latitud y Longitud -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-300">Latitud</label>
+            <div class="flex gap-2">
+              <input
+                v-model="form.latitud"
+                type="text"
+                readonly
+                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-300">Longitud</label>
+            <div class="flex gap-2">
+              <input
+                v-model="form.longitud"
+                type="text"
+                readonly
+                class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
+          <div class="md:col-span-2 flex justify-end">
+            <button
+              type="button"
+              @click="showMapModal = true"
+              class="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+              </svg>
+              Seleccionar Ubicación
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Dirección -->
@@ -344,14 +383,50 @@
         </button>
       </div>
     </form>
+
+    <!-- Modal del Mapa -->
+    <Teleport to="body">
+      <div
+        v-if="showMapModal"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      >
+        <div class="bg-gray-800 rounded-xl w-full max-w-3xl">
+          <div class="p-6">
+            <h2 class="text-xl font-bold text-white mb-4">
+              Seleccionar ubicación
+            </h2>
+            <div
+              class="h-[400px] w-full bg-gray-700 rounded-lg mb-4"
+              ref="mapContainer"
+            ></div>
+            <div class="flex justify-end gap-4">
+              <button
+                @click="showMapModal = false"
+                class="px-6 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
+              >
+                Cancelar
+              </button>
+              <button
+                @click="confirmarUbicacion"
+                class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
 import { adminServices } from "@/services/admin";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 const router = useRouter();
 const toast = useToast();
@@ -364,6 +439,12 @@ const municipios = ref([]);
 
 const previewLogo = ref(null);
 const previewPortada = ref(null);
+
+// Nuevas referencias
+const showMapModal = ref(false);
+const mapContainer = ref(null);
+const map = ref(null);
+const marker = ref(null);
 
 // Formulario con valores por defecto según el modelo
 const form = ref({
@@ -380,8 +461,8 @@ const form = ref({
   moneda_principal: "CUP",
   whatsapp: "",
   horario: "Este negocio aún no ha configurado su horario",
-  latitud: "0",
-  longitud: "0",
+  latitud: "21.9442",
+  longitud: "-79.1714",
   provincia: "",
   municipio: "",
   tema: {
@@ -612,6 +693,78 @@ const loadExistingNegocio = async () => {
   }
 };
 
+// Función para inicializar el mapa
+const initializeMap = () => {
+  if (map.value) {
+    map.value.remove();
+    map.value = null;
+  }
+
+  // Coordenadas de Jatibonico, Sancti Spíritus
+  const defaultLat = 21.9442;
+  const defaultLng = -79.1714;
+
+  // Usar las coordenadas existentes si están disponibles, si no usar las de Jatibonico
+  const lat = form.value.latitud ? parseFloat(form.value.latitud) : defaultLat;
+  const lng = form.value.longitud ? parseFloat(form.value.longitud) : defaultLng;
+
+  nextTick(() => {
+    map.value = L.map(mapContainer.value).setView([lat, lng], 13); // Zoom más cercano para ver mejor la ciudad
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: ''
+    }).addTo(map.value);
+
+    // Siempre agregar un marcador, ya sea en la ubicación existente o en la ubicación por defecto
+    marker.value = L.marker([lat, lng]).addTo(map.value);
+
+    // Evento click en el mapa
+    map.value.on('click', (e) => {
+      const { lat, lng } = e.latlng;
+      if (marker.value) {
+        marker.value.setLatLng([lat, lng]);
+      } else {
+        marker.value = L.marker([lat, lng]).addTo(map.value);
+      }
+    });
+
+    // Ajustar tamaño del mapa
+    setTimeout(() => {
+      map.value?.invalidateSize();
+    }, 100);
+  });
+};
+
+// Watch para el modal
+watch(showMapModal, (newValue) => {
+  if (newValue) {
+    nextTick(() => {
+      initializeMap();
+    });
+  }
+});
+
+// Función para confirmar ubicación
+const confirmarUbicacion = () => {
+  if (marker.value) {
+    const { lat, lng } = marker.value.getLatLng();
+    form.value.latitud = lat.toFixed(6);
+    form.value.longitud = lng.toFixed(6);
+    showMapModal.value = false;
+  }
+};
+
+// Agregar esto después de los imports para corregir el ícono del marcador
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
+
 onMounted(async () => {
   loading.value = true;
   try {
@@ -625,3 +778,9 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style>
+.leaflet-control-container .leaflet-control {
+  z-index: 1000;
+}
+</style>
