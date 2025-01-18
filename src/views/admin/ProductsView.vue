@@ -14,52 +14,6 @@
       </button>
     </div>
 
-    <!-- Filtros -->
-    <div class="bg-gray-800 rounded-xl p-4 mb-6 border border-gray-700">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div>
-          <input 
-            v-model="filters.search"
-            type="text"
-            placeholder="Buscar productos..."
-            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-          >
-        </div>
-        <!-- <div>
-          <select 
-            v-model="filters.category"
-            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-          >
-            <option value="">Todas las categorías</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-              {{ cat.name }}
-            </option>
-          </select>
-        </div> -->
-        <!-- <div>
-          <select 
-            v-model="filters.status"
-            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-          >
-            <option value="">Todos los estados</option>
-            <option value="active">Activo</option>
-            <option value="inactive">Inactivo</option>
-            <option value="out_of_stock">Sin Stock</option>
-          </select>
-        </div> -->
-        <!-- <div>
-          <select 
-            v-model="filters.sort"
-            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
-          >
-            <option value="newest">Más recientes</option>
-            <option value="oldest">Más antiguos</option>
-            <option value="price_asc">Precio: Menor a Mayor</option>
-            <option value="price_desc">Precio: Mayor a Menor</option>
-          </select>
-        </div> -->
-      </div>
-    </div>
 
     <!-- Tabla de Productos -->
     <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
@@ -68,8 +22,9 @@
           <thead>
             <tr class="bg-gray-750">
               <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Producto</th>
-              <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Categoría</th>
+              <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Subcategoría</th>
               <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Precio</th>
+              <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Descuento</th>
               <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Stock</th>
               <th class="px-6 py-4 text-left text-sm font-medium text-gray-400">Estado</th>
               <th class="px-6 py-4 text-right text-sm font-medium text-gray-400">Acciones</th>
@@ -79,15 +34,38 @@
             <tr v-for="product in products" :key="product.id" class="hover:bg-gray-750">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <img :src="product.image" :alt="product.name" class="w-12 h-12 rounded-lg object-cover">
+                  <img 
+                    :src="product.imagen || '/placeholder-image.png'" 
+                    :alt="product.nombre"
+                    @error="$event.target.src = '/placeholder-image.png'"
+                    class="w-12 h-12 rounded-lg object-cover"
+                  >
                   <div>
-                    <div class="font-medium text-white">{{ product.name }}</div>
-                    <div class="text-sm text-gray-400">SKU: {{ product.sku }}</div>
+                    <div class="font-medium text-white">{{ product.nombre }}</div>
+                    <div class="text-sm text-gray-400 line-clamp-1">{{ product.descripcion || 'Sin descripción' }}</div>
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 text-gray-300">{{ product.category }}</td>
-              <td class="px-6 py-4 text-gray-300">${{ parseFloat(product.price).toFixed(2) }}</td>
+              <td class="px-6 py-4 text-gray-300">
+                {{ product.subcategoria?.nombre || 'N/A' }}
+                <span v-if="product.subcategoria?.categoria" class="text-gray-500 text-sm block">
+                  {{ product.subcategoria.categoria.nombre }}
+                </span>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-gray-300">${{ parseFloat(product.precio || 0).toFixed(2) }}</div>
+                <div v-if="product.descuento > 0" class="text-green-500 text-sm">
+                  ${{ parseFloat(product.precio_con_descuento || 0).toFixed(2) }}
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <span v-if="product.descuento > 0" 
+                  class="px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-400"
+                >
+                  {{ product.descuento }}%
+                </span>
+                <span v-else class="text-gray-500">-</span>
+              </td>
               <td class="px-6 py-4">
                 <span 
                   :class="{
@@ -103,12 +81,11 @@
                 <span 
                   class="px-2 py-1 text-xs rounded-full"
                   :class="{
-                    'bg-green-500/20 text-green-400': product.status === 'active',
-                    'bg-gray-500/20 text-gray-400': product.status === 'inactive',
-                    'bg-red-500/20 text-red-400': product.status === 'out_of_stock'
+                    'bg-green-500/20 text-green-400': product.activo,
+                    'bg-gray-500/20 text-gray-400': !product.activo
                   }"
                 >
-                  {{ statusText(product.status) }}
+                  {{ product.activo ? 'Activo' : 'Inactivo' }}
                 </span>
               </td>
               <td class="px-6 py-4">
@@ -116,14 +93,16 @@
                   <button 
                     @click="editProduct(product)"
                     class="text-gray-400 hover:text-white"
+                    title="Editar producto"
                   >
-                    <i class="fas fa-edit"></i>
+                    <PencilSquareIcon class="w-5 h-5" />
                   </button>
                   <button 
                     @click="deleteProduct(product.id)"
                     class="text-gray-400 hover:text-red-500"
+                    title="Eliminar producto"
                   >
-                    <i class="fas fa-trash"></i>
+                    <TrashIcon class="w-5 h-5" />
                   </button>
                 </div>
               </td>
@@ -388,10 +367,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useToast } from 'vue-toastification';
 import { adminServices } from '@/services/admin';
-import { XMarkIcon } from '@heroicons/vue/24/outline';
+import { 
+  XMarkIcon,
+  PencilSquareIcon,
+  TrashIcon 
+} from '@heroicons/vue/24/outline';
 
 const toast = useToast();
 const showAddModal = ref(false);
@@ -414,12 +397,7 @@ const productForm = ref({
   activo: true
 });
 
-const filters = ref({
-  search: '',
-  category: '',
-  status: '',
-  sort: 'newest'
-});
+
 
 const products = ref([]);
 
@@ -488,14 +466,19 @@ const closeModal = () => {
 
 const saveProduct = async () => {
   try {
+    if (!selectedSubcategory.value) {
+      toast.error('Debes seleccionar una subcategoría');
+      return;
+    }
+
     isSubmitting.value = true;
     const formData = new FormData();
     formData.append('nombre', productForm.value.nombre);
-    formData.append('descripcion', productForm.value.descripcion);
+    formData.append('descripcion', productForm.value.descripcion || '');
     formData.append('precio', productForm.value.precio);
     formData.append('stock', productForm.value.stock);
     formData.append('subcategoria', selectedSubcategory.value);
-    formData.append('descuento', productForm.value.descuento);
+    formData.append('descuento', productForm.value.descuento || 0);
     formData.append('activo', productForm.value.activo);
     
     if (productForm.value.imagen) {
@@ -520,17 +503,22 @@ const saveProduct = async () => {
 };
 
 const editProduct = (product) => {
+  if (!product?.subcategoria?.categoria) {
+    toast.error('Error: Datos del producto incompletos');
+    return;
+  }
+
   editingProduct.value = product;
   selectedCategory.value = product.subcategoria.categoria.id;
   selectedSubcategory.value = product.subcategoria.id;
   productForm.value = {
-    nombre: product.nombre,
-    descripcion: product.descripcion,
-    precio: product.precio,
-    stock: product.stock,
+    nombre: product.nombre || '',
+    descripcion: product.descripcion || '',
+    precio: product.precio || 0,
+    stock: product.stock || 0,
     imagen: null,
-    descuento: product.descuento,
-    activo: product.activo
+    descuento: product.descuento || 0,
+    activo: typeof product.activo === 'boolean' ? product.activo : true
   };
   showAddModal.value = true;
 };
@@ -561,6 +549,13 @@ const calculateDiscountedPrice = computed(() => {
   const descuento = parseFloat(productForm.value.descuento);
   const precioConDescuento = precio - (precio * descuento / 100);
   return precioConDescuento.toFixed(2);
+});
+
+// Agregar un watch para manejar el cambio de categoría
+watch(selectedCategory, (newValue) => {
+  if (newValue) {
+    selectedSubcategory.value = null; // Reset subcategoría cuando cambia la categoría
+  }
 });
 
 onMounted(() => {
