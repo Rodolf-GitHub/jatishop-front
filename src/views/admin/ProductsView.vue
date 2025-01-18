@@ -156,10 +156,26 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useToast } from 'vue-toastification';
+import { adminServices } from '@/services/admin';
 
+const toast = useToast();
 const showAddModal = ref(false);
 const currentPage = ref(1);
+const editingProduct = ref(null);
+const categories = ref([]);
+const selectedCategory = ref(null);
+const selectedSubcategory = ref(null);
+
+const productForm = ref({
+  nombre: '',
+  descripcion: '',
+  precio: '',
+  stock: '',
+  imagen: null,
+  subcategoria: null
+});
 
 const filters = ref({
   search: '',
@@ -168,63 +184,108 @@ const filters = ref({
   sort: 'newest'
 });
 
-const categories = ref([
-  { id: 1, name: 'Electrónicos' },
-  { id: 2, name: 'Ropa' },
-  { id: 3, name: 'Hogar' }
-]);
+const products = ref([]);
 
-const products = ref([
-  {
-    id: 1,
-    name: 'iPhone 13 Pro',
-    sku: 'IP13-PRO-256',
-    category: 'Electrónicos',
-    price: 999.99,
-    stock: 15,
-    status: 'active',
-    image: 'https://via.placeholder.com/150'
-  },
-  {
-    id: 2,
-    name: 'MacBook Pro M1',
-    sku: 'MB-PRO-M1',
-    category: 'Electrónicos',
-    price: 1299.99,
-    stock: 8,
-    status: 'active',
-    image: 'https://via.placeholder.com/150'
-  },
-  {
-    id: 3,
-    name: 'AirPods Pro',
-    sku: 'AP-PRO-2',
-    category: 'Electrónicos',
-    price: 249.99,
-    stock: 0,
-    status: 'out_of_stock',
-    image: 'https://via.placeholder.com/150'
+// Cargar categorías y subcategorías
+const loadCategories = async () => {
+  try {
+    const response = await adminServices.getMyCategories();
+    categories.value = response.data;
+  } catch (error) {
+    toast.error('Error al cargar las categorías');
+    console.error('Error:', error);
   }
-]);
+};
 
-const getStatusText = (status) => {
-  const statusMap = {
-    active: 'Activo',
-    inactive: 'Inactivo',
-    out_of_stock: 'Sin Stock'
+// Cargar productos
+const loadProducts = async () => {
+  try {
+    const response = await adminServices.getMyProducts();
+    products.value = response.data;
+  } catch (error) {
+    toast.error('Error al cargar los productos');
+    console.error('Error:', error);
+  }
+};
+
+const handleImageUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    productForm.value.imagen = file;
+  }
+};
+
+const closeModal = () => {
+  showAddModal.value = false;
+  editingProduct.value = null;
+  selectedCategory.value = null;
+  selectedSubcategory.value = null;
+  productForm.value = {
+    nombre: '',
+    descripcion: '',
+    precio: '',
+    stock: '',
+    imagen: null,
+    subcategoria: null
   };
-  return statusMap[status] || status;
+};
+
+const saveProduct = async () => {
+  try {
+    const formData = new FormData();
+    formData.append('nombre', productForm.value.nombre);
+    formData.append('descripcion', productForm.value.descripcion);
+    formData.append('precio', productForm.value.precio);
+    formData.append('stock', productForm.value.stock);
+    formData.append('subcategoria', selectedSubcategory.value);
+    if (productForm.value.imagen) {
+      formData.append('imagen', productForm.value.imagen);
+    }
+
+    if (editingProduct.value) {
+      await adminServices.updateProduct(editingProduct.value.id, formData);
+      toast.success('Producto actualizado correctamente');
+    } else {
+      await adminServices.createProduct(formData);
+      toast.success('Producto creado correctamente');
+    }
+    closeModal();
+    loadProducts();
+  } catch (error) {
+    toast.error('Error al guardar el producto');
+    console.error('Error:', error);
+  }
 };
 
 const editProduct = (product) => {
-  // Aquí iría la lógica para editar el producto
-  console.log('Editando producto:', product);
+  editingProduct.value = product;
+  selectedCategory.value = product.subcategoria.categoria.id;
+  selectedSubcategory.value = product.subcategoria.id;
+  productForm.value = {
+    nombre: product.nombre,
+    descripcion: product.descripcion,
+    precio: product.precio,
+    stock: product.stock,
+    imagen: null
+  };
+  showAddModal.value = true;
 };
 
-const deleteProduct = (productId) => {
+const deleteProduct = async (productId) => {
   if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-    // Aquí iría la lógica para eliminar el producto
-    console.log('Eliminando producto:', productId);
+    try {
+      await adminServices.deleteProduct(productId);
+      toast.success('Producto eliminado correctamente');
+      loadProducts();
+    } catch (error) {
+      toast.error('Error al eliminar el producto');
+      console.error('Error:', error);
+    }
   }
 };
+
+onMounted(() => {
+  loadCategories();
+  loadProducts();
+});
 </script> 

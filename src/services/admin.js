@@ -225,12 +225,24 @@ export const adminServices = {
     return adminApi.get(`/mi-negocio/categorias/${categoryId}/subcategories/`);
   },
 
-  createSubcategory(categoryId, data) {
-    return adminApi.post(`/mi-negocio/categorias/${categoryId}/subcategories/`, data);
+  createSubcategory(categoryId, formData) {
+    return adminApi.post(`/mi-negocio/categorias/${categoryId}/subcategories/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   },
 
-  updateSubcategory(categoryId, subcategoryId, data) {
-    return adminApi.put(`/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`, data);
+  updateSubcategory(categoryId, subcategoryId, formData) {
+    return adminApi.put(
+      `/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`, 
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
   },
 
   deleteSubcategory(categoryId, subcategoryId) {
