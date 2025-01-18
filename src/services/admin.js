@@ -177,7 +177,7 @@ export const adminServices = {
   updateTema: (colores) => {
     return adminApi.put("/mi-negocio/negocio/update_theme/", {
       color_primario: colores.color_primario,
-      color_secundario: colores.color_secundario
+      color_secundario: colores.color_secundario,
     });
   },
 
@@ -191,6 +191,8 @@ export const adminServices = {
       `/ubicaciones/municipios/${encodeURIComponent(provincia)}/`
     );
   },
+
+  register: (userData) => adminApi.post("/auth/register/", userData),
 };
 
 // Interceptor para manejar errores de autenticación

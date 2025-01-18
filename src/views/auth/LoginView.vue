@@ -306,8 +306,11 @@ const handleLogin = async () => {
 };
 
 const handleRegister = async () => {
+  errorMessage.value = "";
+
+  // Validar que las contraseñas coincidan
   if (registerForm.value.password !== registerForm.value.confirmPassword) {
-    alert("Las contraseñas no coinciden");
+    errorMessage.value = "Las contraseñas no coinciden";
     return;
   }
 
@@ -319,8 +322,26 @@ const handleRegister = async () => {
       email: registerForm.value.email,
       password: registerForm.value.password,
     });
+
+    toast.success("Cuenta creada exitosamente");
+    router.push("/admin/home");
   } catch (err) {
-    console.error(err);
+    console.error("Error en registro:", err);
+    // Manejar diferentes tipos de errores
+    if (err.response?.data) {
+      if (err.response.data.username) {
+        errorMessage.value = "Este nombre de usuario ya está en uso";
+      } else if (err.response.data.email) {
+        errorMessage.value = "Este correo electrónico ya está registrado";
+      } else if (typeof err.response.data === "object") {
+        errorMessage.value = Object.values(err.response.data).flat().join(". ");
+      } else {
+        errorMessage.value = err.response.data;
+      }
+    } else {
+      errorMessage.value =
+        "Error al crear la cuenta. Por favor, intente nuevamente.";
+    }
   }
 };
 
