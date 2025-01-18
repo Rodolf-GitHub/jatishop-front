@@ -28,6 +28,12 @@ const router = createRouter({
           component: () => import("../views/marketplace/ProductsView.vue"),
         },
         {
+          path: "/login",
+          name: "login",
+          component: LoginView,
+          meta: { requiresGuest: true },
+        },
+        {
           path: "tiendas",
           name: "stores-list",
           component: StoresListView,
@@ -44,12 +50,7 @@ const router = createRouter({
         },
       ],
     },
-    {
-      path: "/login",
-      name: "login",
-      component: LoginView,
-      meta: { requiresGuest: true },
-    },
+
     {
       path: "/store/:slug",
       component: StoreLayout,

@@ -8,6 +8,7 @@ import App from "./App.vue";
 import router from "./router";
 import Toast from "vue-toastification/dist/index.mjs";
 import "vue-toastification/dist/index.css";
+import 'leaflet/dist/leaflet.css';
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
