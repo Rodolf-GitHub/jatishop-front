@@ -247,6 +247,31 @@ export const adminServices = {
 
   deleteSubcategory(categoryId, subcategoryId) {
     return adminApi.delete(`/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`);
+  },
+
+  // Productos
+  getMyProducts() {
+    return adminApi.get('/mi-negocio/productos/my_products/');
+  },
+
+  createProduct(formData) {
+    return adminApi.post('/mi-negocio/productos/my_products/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+
+  updateProduct(id, formData) {
+    return adminApi.put(`/mi-negocio/productos/${id}/manage_product/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+
+  deleteProduct(id) {
+    return adminApi.delete(`/mi-negocio/productos/${id}/manage_product/`);
   }
 };
 
