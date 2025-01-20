@@ -201,7 +201,9 @@
         <!-- Nuevos campos de Latitud y Longitud -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
           <div class="space-y-2">
-            <label class="block text-sm font-medium text-gray-300">Latitud</label>
+            <label class="block text-sm font-medium text-gray-300"
+              >Latitud</label
+            >
             <div class="flex gap-2">
               <input
                 v-model="form.latitud"
@@ -212,7 +214,9 @@
             </div>
           </div>
           <div class="space-y-2">
-            <label class="block text-sm font-medium text-gray-300">Longitud</label>
+            <label class="block text-sm font-medium text-gray-300"
+              >Longitud</label
+            >
             <div class="flex gap-2">
               <input
                 v-model="form.longitud"
@@ -228,9 +232,24 @@
               @click="showMapModal = true"
               class="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center justify-center gap-2"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-5 h-5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                />
               </svg>
               Seleccionar Ubicación
             </button>
@@ -427,6 +446,7 @@ import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { PROVINCIAS, getMunicipios } from "@/utils/ubicaciones";
 
 const router = useRouter();
 const toast = useToast();
@@ -434,7 +454,7 @@ const toast = useToast();
 const negocio = ref(null);
 const loading = ref(false);
 const error = ref(null);
-const provincias = ref([]);
+const provincias = ref(PROVINCIAS);
 const municipios = ref([]);
 
 const previewLogo = ref(null);
@@ -473,54 +493,38 @@ const form = ref({
 
 // Cargar provincias
 const loadProvincias = async () => {
-  try {
-    const response = await adminServices.getProvincias();
-    provincias.value = response.data;
-  } catch (err) {
-    console.error("Error al cargar provincias:", err);
-    toast.error("Error al cargar las provincias");
-  }
+  // try {
+  //   const response = await adminServices.getProvincias();
+  //   provincias.value = response.data;
+  // } catch (err) {
+  //   console.error("Error al cargar provincias:", err);
+  //   toast.error("Error al cargar las provincias");
+  // }
+  const loadProvincias = () => {
+    provincias.value = PROVINCIAS;
+  };
 };
 
 // Cargar municipios cuando cambia la provincia
-const handleProvinciaChange = async () => {
+const handleProvinciaChange = () => {
   form.value.municipio = ""; // Reset municipio
-  municipios.value = []; // Reset lista de municipios
-
-  if (!form.value.provincia) return;
-
-  try {
-    loading.value = true;
-    const response = await adminServices.getMunicipios(form.value.provincia);
-    municipios.value = response.data;
-  } catch (err) {
-    console.error("Error al cargar municipios:", err);
-    toast.error("Error al cargar los municipios");
-  } finally {
-    loading.value = false;
-  }
+  municipios.value = getMunicipios(form.value.provincia); // Obtener municipios de la provincia seleccionada
 };
 
 // Observar cambios en provincia
 watch(
   () => form.value.provincia,
-  async (newValue, oldValue) => {
-    if (newValue && newValue !== oldValue) {
-      try {
-        const response = await adminServices.getMunicipios(newValue);
-        municipios.value = response.data;
-
-        // Solo resetear municipio si la provincia cambió (no en la carga inicial)
-        if (oldValue) {
-          form.value.municipio = "";
-        }
-      } catch (err) {
-        console.error("Error al cargar municipios:", err);
-        toast.error("Error al cargar los municipios");
+  (newValue) => {
+    if (newValue) {
+      municipios.value = getMunicipios(newValue);
+      // Solo resetear municipio si la provincia cambió (no en la carga inicial)
+      if (negocio.value && negocio.value.provincia !== newValue) {
+        form.value.municipio = "";
       }
+    } else {
+      municipios.value = [];
     }
-  },
-  { immediate: true }
+  }
 );
 
 // Manejar cambios de imágenes
@@ -706,20 +710,22 @@ const initializeMap = () => {
 
   // Usar las coordenadas existentes si están disponibles, si no usar las de Jatibonico
   const lat = form.value.latitud ? parseFloat(form.value.latitud) : defaultLat;
-  const lng = form.value.longitud ? parseFloat(form.value.longitud) : defaultLng;
+  const lng = form.value.longitud
+    ? parseFloat(form.value.longitud)
+    : defaultLng;
 
   nextTick(() => {
     map.value = L.map(mapContainer.value).setView([lat, lng], 13); // Zoom más cercano para ver mejor la ciudad
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: ''
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "",
     }).addTo(map.value);
 
     // Siempre agregar un marcador, ya sea en la ubicación existente o en la ubicación por defecto
     marker.value = L.marker([lat, lng]).addTo(map.value);
 
     // Evento click en el mapa
-    map.value.on('click', (e) => {
+    map.value.on("click", (e) => {
       const { lat, lng } = e.latlng;
       if (marker.value) {
         marker.value.setLatLng([lat, lng]);

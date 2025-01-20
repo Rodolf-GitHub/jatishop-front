@@ -49,7 +49,7 @@ export function useAuth() {
       user.value = response.data.user;
       localStorage.setItem("admin_token", response.data.token);
       localStorage.setItem("admin_user", JSON.stringify(response.data.user));
-      router.push("/admin/home");
+      router.push("/login");
     } catch (err) {
       console.error('Error en registro:', err);
       if (err.response?.data) {
