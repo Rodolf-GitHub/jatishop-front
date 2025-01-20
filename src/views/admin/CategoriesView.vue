@@ -28,7 +28,7 @@
               class="w-10 h-10 rounded-lg overflow-hidden"
             >
               <img 
-                :src="category.imagen" 
+                :src="getImageUrl(category.imagen)" 
                 class="w-full h-full object-cover"
                 alt="Categoría"
                 @error="$event.target.style.display='none'"
@@ -92,7 +92,7 @@
                 class="w-8 h-8 rounded-lg overflow-hidden"
               >
                 <img 
-                  :src="subcategory.imagen" 
+                  :src="getImageUrl(subcategory.imagen)" 
                   class="w-full h-full object-cover"
                   alt="Subcategoría"
                   @error="$event.target.style.display='none'"
@@ -232,6 +232,7 @@
 import { ref, onMounted } from 'vue';
 import { useToast } from 'vue-toastification';
 import { adminServices } from '@/services/admin';
+import { getImageUrl } from '@/utils/image';
 import { 
   PlusCircleIcon, 
   PencilSquareIcon, 
@@ -346,6 +347,22 @@ const addSubcategory = (categoryId) => {
 const handleSubcategoryImageUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
+    // Validar el tipo y tamaño del archivo
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const maxSize = 2 * 1024 * 1024; // 2MB
+
+    if (!validTypes.includes(file.type)) {
+      toast.error('El archivo debe ser una imagen (JPEG, PNG o GIF)');
+      event.target.value = ''; // Limpiar el input
+      return;
+    }
+
+    if (file.size > maxSize) {
+      toast.error('La imagen no debe superar los 2MB');
+      event.target.value = ''; // Limpiar el input
+      return;
+    }
+
     subcategoryForm.value.imagen = file;
   }
 };
@@ -364,8 +381,12 @@ const saveSubcategory = async () => {
   try {
     const formData = new FormData();
     formData.append('nombre', subcategoryForm.value.nombre);
-    formData.append('categoria', selectedCategoryId.value);
-    if (subcategoryForm.value.imagen) {
+    
+    // No es necesario enviar la categoría en el formData ya que va en la URL
+    // formData.append('categoria', selectedCategoryId.value);
+    
+    // Asegúrate de que la imagen existe antes de intentar agregarla
+    if (subcategoryForm.value.imagen instanceof File) {
       formData.append('imagen', subcategoryForm.value.imagen);
     }
 
@@ -383,8 +404,8 @@ const saveSubcategory = async () => {
     closeSubcategoryModal();
     loadCategories();
   } catch (error) {
+    console.error('Error detallado:', error);
     toast.error('Error al guardar la subcategoría');
-    console.error('Error:', error);
   }
 };
 
