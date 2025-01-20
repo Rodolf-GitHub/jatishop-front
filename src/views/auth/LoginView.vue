@@ -309,7 +309,7 @@ const handleRegister = async () => {
     });
 
     toast.success("Cuenta creada exitosamente");
-    router.push("/admin/home");
+    router.push("/login");
   } catch (err) {
     console.error("Error en registro:", err);
     // Manejar diferentes tipos de errores
