@@ -500,9 +500,7 @@ const loadProvincias = async () => {
   //   console.error("Error al cargar provincias:", err);
   //   toast.error("Error al cargar las provincias");
   // }
-  const loadProvincias = () => {
-    provincias.value = PROVINCIAS;
-  };
+  provincias.value = PROVINCIAS;
 };
 
 // Cargar municipios cuando cambia la provincia
