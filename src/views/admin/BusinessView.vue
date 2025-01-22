@@ -384,8 +384,14 @@
       <div class="flex justify-end space-x-4">
         <button
           type="button"
-          class="px-6 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
-          @click="window.location.reload()"
+          :disabled="!hasChanges"
+          :class="[
+            'px-6 py-2 rounded-lg',
+            hasChanges
+              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              : 'bg-gray-600 text-gray-500 cursor-not-allowed',
+          ]"
+          @click="resetForm"
         >
           Cancelar
         </button>
@@ -466,6 +472,9 @@ const mapContainer = ref(null);
 const map = ref(null);
 const marker = ref(null);
 
+const initialFormState = ref(null); // Para guardar el estado inicial del formulario
+const hasChanges = ref(false); // Para controlar si hay cambios
+
 // Formulario con valores por defecto según el modelo
 const form = ref({
   nombre: "",
@@ -503,11 +512,7 @@ const loadProvincias = async () => {
   provincias.value = PROVINCIAS;
 };
 
-// Cargar municipios cuando cambia la provincia
-const handleProvinciaChange = () => {
-  form.value.municipio = ""; // Reset municipio
-  municipios.value = getMunicipios(form.value.provincia); // Obtener municipios de la provincia seleccionada
-};
+const cancelFormBusiness = () => {};
 
 // Observar cambios en provincia
 watch(
@@ -624,6 +629,12 @@ const handleSubmit = async () => {
 
       toast.success("Negocio creado exitosamente");
     }
+
+    // Después de guardar exitosamente, actualizamos el estado inicial
+    saveInitialState();
+    // Reseteamos la bandera de cambios
+    hasChanges.value = false;
+    
   } catch (err) {
     console.error("Error:", err);
     if (err.response?.data) {
@@ -637,33 +648,32 @@ const handleSubmit = async () => {
   }
 };
 
-// Resetear formulario
+// Función para guardar el estado inicial del formulario
+const saveInitialState = () => {
+  initialFormState.value = JSON.parse(JSON.stringify(form.value));
+};
+
+// Función para verificar cambios
+const checkChanges = () => {
+  if (!initialFormState.value) return false;
+  return JSON.stringify(form.value) !== JSON.stringify(initialFormState.value);
+};
+
+// Watch para detectar cambios en el formulario
+watch(
+  () => ({ ...form.value }),
+  () => {
+    hasChanges.value = checkChanges();
+  },
+  { deep: true }
+);
+
+// Función para resetear el formulario
 const resetForm = () => {
-  Object.assign(form.value, {
-    nombre: "",
-    descripcion: "Este negocio aún no tiene descripción",
-    direccion: "Este negocio aún no ha configurado su dirección",
-    telefono: "Sin teléfono",
-    email: "",
-    logo: null,
-    img_portada: null,
-    activo: true,
-    hace_domicilio: false,
-    acepta_transferencia: false,
-    moneda_principal: "CUP",
-    whatsapp: "",
-    horario: "Este negocio aún no ha configurado su horario",
-    latitud: "0",
-    longitud: "0",
-    provincia: "",
-    municipio: "",
-    tema: {
-      color_primario: "#8E44AD",
-      color_secundario: "#E67E22",
-    },
-  });
-  previewLogo.value = null;
-  previewPortada.value = null;
+  if (initialFormState.value) {
+    form.value = JSON.parse(JSON.stringify(initialFormState.value));
+    hasChanges.value = false;
+  }
 };
 
 // Cargar negocio existente si lo hay
@@ -688,6 +698,9 @@ const loadExistingNegocio = async () => {
       if (response.data.logo) previewLogo.value = response.data.logo;
       if (response.data.img_portada)
         previewPortada.value = response.data.img_portada;
+
+      // Guardar el estado inicial después de cargar los datos
+      saveInitialState();
     } catch (err) {
       console.error("Error al cargar negocio:", err);
       toast.error("Error al cargar la información del negocio");
