@@ -82,10 +82,10 @@
         <div class="p-4 md:p-6 border-b border-gray-700">
           <div class="flex items-center justify-between">
             <!-- Información de la categoría -->
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 min-w-0 flex-1">
               <div
                 v-if="category.imagen"
-                class="w-16 h-16 rounded-lg overflow-hidden"
+                class="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden"
               >
                 <img
                   :src="getImageUrl(category.imagen)"
@@ -96,27 +96,27 @@
               </div>
               <div
                 v-else
-                class="w-16 h-16 rounded-lg bg-gray-700 flex items-center justify-center"
+                class="w-16 h-16 flex-shrink-0 rounded-lg bg-gray-700 flex items-center justify-center"
               >
                 <FolderIcon class="w-8 h-8 text-gray-400" />
               </div>
-              <div>
-                <h3 class="text-lg font-medium text-white">{{ category.nombre }}</h3>
-                <p v-if="category.descripcion" class="text-sm text-gray-400">
+              <div class="min-w-0 flex-1">
+                <h3 class="text-lg font-medium text-white truncate max-w-[200px]">{{ category.nombre }}</h3>
+                <p v-if="category.descripcion" class="text-sm text-gray-400 truncate max-w-[200px]">
                   {{ category.descripcion }}
                 </p>
               </div>
             </div>
 
             <!-- Botones de acción de categoría -->
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-shrink-0">
               <button
                 @click="editCategory(category)"
                 class="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
                 title="Editar categoría"
               >
                 <PencilSquareIcon class="w-5 h-5" />
-                <span class="text-sm hidden md:inline">Editar Categoría</span>
+                <span class="text-sm hidden md:inline">Editar</span>
               </button>
               <button
                 @click="deleteCategory(category.id)"
@@ -172,10 +172,10 @@
               :key="subcategory.id"
               class="p-4 flex items-center justify-between"
             >
-              <div class="flex items-center gap-4">
+              <div class="flex items-center gap-4 min-w-0 flex-1">
                 <div
                   v-if="subcategory.imagen"
-                  class="w-10 h-10 rounded-lg overflow-hidden"
+                  class="w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden"
                 >
                   <img
                     :src="getImageUrl(subcategory.imagen)"
@@ -186,13 +186,15 @@
                 </div>
                 <div
                   v-else
-                  class="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center"
+                  class="w-10 h-10 flex-shrink-0 rounded-lg bg-gray-700 flex items-center justify-center"
                 >
                   <DocumentIcon class="w-6 h-6 text-gray-400" />
                 </div>
-                <span class="text-gray-300">{{ subcategory.nombre }}</span>
+                <span class="text-gray-300 truncate max-w-[200px]">{{ subcategory.nombre }}</span>
               </div>
-              <div class="flex gap-2">
+              
+              <!-- Botones de acción de subcategoría -->
+              <div class="flex gap-2 flex-shrink-0">
                 <button
                   @click="editSubcategory(category.id, subcategory)"
                   class="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white transition-colors"
