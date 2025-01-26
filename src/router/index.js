@@ -13,6 +13,7 @@ import UsersView from "../views/admin/UsersView.vue";
 import LoginView from "@/views/auth/LoginView.vue";
 import HomeAdminView from "@/views/admin/HomeAdminView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
+import RegisterView from '@/views/auth/RegisterView.vue'
 import { useAuth } from "@/composables/useAuth";
 
 const router = createRouter({
@@ -32,6 +33,12 @@ const router = createRouter({
           name: "login",
           component: LoginView,
           meta: { requiresGuest: true },
+        },
+        {
+          path: "/register",
+          name: "register",
+          component: RegisterView,
+          meta: { requiresGuest: true }
         },
         {
           path: "tiendas",

@@ -83,11 +83,9 @@ export const adminServices = {
   },
 
   // Negocios
-  getNegocio: async (slug) => {
+  getNegocio: async () => {
     try {
-      const response = await adminApi.get(
-        `/marketplace/negocios/${slug.slug}/`
-      );
+      const response = await adminApi.get('/mi-negocio/negocio/my_business/');
       return response;
     } catch (error) {
       console.error("Error al obtener negocio:", error);

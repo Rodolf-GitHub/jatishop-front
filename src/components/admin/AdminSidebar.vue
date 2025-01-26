@@ -27,7 +27,7 @@
             :class="[
               setupProgress.negocio 
                 ? 'text-gray-300 hover:bg-gray-700 hover:text-indigo-400' 
-                : 'text-gray-500 cursor-not-allowed'
+                : 'text-gray-500'
             ]"
           >
             <BuildingStorefrontIcon class="w-6 h-6 flex-shrink-0" />
@@ -43,7 +43,7 @@
             :class="[
               setupProgress.categoria 
                 ? 'text-gray-300 hover:bg-gray-700 hover:text-indigo-400' 
-                : 'text-gray-500 cursor-not-allowed'
+                : 'text-gray-500'
             ]"
           >
             <TagIcon class="w-6 h-6 flex-shrink-0" />
@@ -52,14 +52,14 @@
         </div>
 
         <!-- Productos -->
-        <div class="relative" v-if="setupProgress.categoria">
+        <div class="relative" v-if="setupProgress.subcategoria">
           <router-link 
             to="/admin/products"
             class="group flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
             :class="[
               setupProgress.producto 
                 ? 'text-gray-300 hover:bg-gray-700 hover:text-indigo-400' 
-                : 'text-gray-500 cursor-not-allowed'
+                : 'text-gray-500'
             ]"
           >
             <CubeIcon class="w-6 h-6 flex-shrink-0" />
@@ -90,20 +90,50 @@
 <script setup>
 import { useSetupProgress } from '@/composables/useSetupProgress';
 import { useRoute } from 'vue-router';
+import { onMounted, watch, onUnmounted } from 'vue';
+import { emitter, EVENT_TYPES } from '@/utils/eventBus';
 import {
   HomeIcon,
   BuildingStorefrontIcon,
   TagIcon,
   CubeIcon,
-  LockClosedIcon
 } from '@heroicons/vue/24/outline';
 
 const route = useRoute();
-const { setupProgress } = useSetupProgress();
+const { setupProgress, checkSetupProgress } = useSetupProgress();
 
 const isActiveRoute = (path) => {
   return route.path === path;
 };
+
+// Función para verificar el progreso
+const verifyProgress = async () => {
+  const isCompleted = localStorage.getItem('business_progress_completed') === 'true';
+  if (!isCompleted) {
+    await checkSetupProgress();
+  }
+};
+
+// Escuchar eventos de actualización
+const setupEventListeners = () => {
+  emitter.on(EVENT_TYPES.BUSINESS_UPDATED, verifyProgress);
+  emitter.on(EVENT_TYPES.CATEGORY_UPDATED, verifyProgress);
+  emitter.on(EVENT_TYPES.SUBCATEGORY_UPDATED, verifyProgress);
+  emitter.on(EVENT_TYPES.PRODUCT_UPDATED, verifyProgress);
+};
+
+// Limpiar listeners cuando el componente se desmonta
+onUnmounted(() => {
+  emitter.off(EVENT_TYPES.BUSINESS_UPDATED, verifyProgress);
+  emitter.off(EVENT_TYPES.CATEGORY_UPDATED, verifyProgress);
+  emitter.off(EVENT_TYPES.SUBCATEGORY_UPDATED, verifyProgress);
+  emitter.off(EVENT_TYPES.PRODUCT_UPDATED, verifyProgress);
+});
+
+onMounted(() => {
+  verifyProgress();
+  setupEventListeners();
+});
 </script>
 
 <style scoped>

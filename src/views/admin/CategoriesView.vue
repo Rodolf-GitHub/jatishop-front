@@ -437,6 +437,7 @@ import {
   FolderIcon,
   DocumentIcon,
 } from "@heroicons/vue/24/outline";
+import { emitter, EVENT_TYPES } from '@/utils/eventBus';
 
 const toast = useToast();
 const showAddModal = ref(false);
@@ -552,6 +553,7 @@ const saveCategory = async () => {
     }
     closeModal();
     loadCategories();
+    emitter.emit(EVENT_TYPES.CATEGORY_UPDATED);
   } catch (error) {
     console.error("Error:", error);
     toast.error("Error al guardar la categoría");
@@ -615,6 +617,7 @@ const saveSubcategory = async () => {
     }
     closeSubcategoryModal();
     loadCategories();
+    emitter.emit(EVENT_TYPES.SUBCATEGORY_UPDATED);
   } catch (error) {
     console.error("Error:", error);
     toast.error("Error al guardar la subcategoría");

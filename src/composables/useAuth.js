@@ -45,18 +45,12 @@ export function useAuth() {
     error.value = null;
     try {
       const response = await adminServices.register(userData);
-      token.value = response.data.token;
-      user.value = response.data.user;
-      localStorage.setItem("admin_token", response.data.token);
-      localStorage.setItem("admin_user", JSON.stringify(response.data.user));
-      router.push("/login");
+      return response;
     } catch (err) {
       console.error('Error en registro:', err);
       if (err.response?.data) {
-        // Manejar errores específicos del backend
         const errorData = err.response.data;
         if (typeof errorData === 'object') {
-          // Si hay múltiples errores, concatenarlos
           const errorMessages = Object.values(errorData)
             .flat()
             .join('. ');
