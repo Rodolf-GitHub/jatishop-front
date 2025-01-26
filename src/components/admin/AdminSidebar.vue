@@ -32,21 +32,11 @@
           >
             <BuildingStorefrontIcon class="w-6 h-6 flex-shrink-0" />
             <span>Mi Negocio</span>
-            <LockClosedIcon 
-              v-if="!setupProgress.negocio"
-              class="w-5 h-5 ml-auto text-gray-500" 
-            />
-            <div v-if="!setupProgress.negocio" class="absolute right-2 top-1/2 -translate-y-1/2">
-              <span class="flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-yellow-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-              </span>
-            </div>
           </router-link>
         </div>
 
         <!-- Categorías -->
-        <div class="relative">
+        <div class="relative" v-if="setupProgress.negocio">
           <router-link 
             to="/admin/categories"
             class="group flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
@@ -58,21 +48,11 @@
           >
             <TagIcon class="w-6 h-6 flex-shrink-0" />
             <span>Categorías</span>
-            <LockClosedIcon 
-              v-if="!setupProgress.categoria"
-              class="w-5 h-5 ml-auto text-gray-500" 
-            />
-            <div v-if="setupProgress.negocio && !setupProgress.categoria" class="absolute right-2 top-1/2 -translate-y-1/2">
-              <span class="flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-yellow-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-              </span>
-            </div>
           </router-link>
         </div>
 
         <!-- Productos -->
-        <div class="relative">
+        <div class="relative" v-if="setupProgress.categoria">
           <router-link 
             to="/admin/products"
             class="group flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
@@ -84,19 +64,25 @@
           >
             <CubeIcon class="w-6 h-6 flex-shrink-0" />
             <span>Productos</span>
-            <LockClosedIcon 
-              v-if="!setupProgress.producto"
-              class="w-5 h-5 ml-auto text-gray-500" 
-            />
-            <div v-if="setupProgress.categoria && !setupProgress.producto" class="absolute right-2 top-1/2 -translate-y-1/2">
-              <span class="flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-yellow-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-yellow-500"></span>
-              </span>
-            </div>
           </router-link>
         </div>
       </nav>
+
+      <!-- Mensajes informativos -->
+      <div class="mt-6 text-sm text-gray-400">
+        <p v-if="!setupProgress.negocio" class="p-3 bg-gray-700 rounded-lg mb-2">
+          ⚡ Primero crea tu negocio para comenzar (ej: "Mi Restaurante")
+        </p>
+        <p v-else-if="!setupProgress.categoria" class="p-3 bg-gray-700 rounded-lg mb-2">
+          📋 Crea las categorías principales (ej: "Alimentos", "Bebidas")
+        </p>
+        <p v-else-if="!setupProgress.subcategoria" class="p-3 bg-gray-700 rounded-lg mb-2">
+          📑 Agrega subcategorías (ej: "Comida Rápida", "Postres", "Ensaladas")
+        </p>
+        <p v-else-if="!setupProgress.producto" class="p-3 bg-gray-700 rounded-lg mb-2">
+          🎉 Ya puedes agregar tus productos (ej: "Hamburguesa Clásica", "Pizza Margherita")
+        </p>
+      </div>
     </div>
   </aside>
 </template>
