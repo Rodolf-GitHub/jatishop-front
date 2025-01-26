@@ -261,15 +261,16 @@ export const adminServices = {
   },
 
   updateProduct(id, formData) {
-    return adminApi.put(`/mi-negocio/productos/${id}/manage_product/`, formData, {
+    return adminApi.put(`/mi-negocio/productos/${id}/update_product/`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
-      }
+      },
+      timeout: 0
     });
   },
 
   deleteProduct(id) {
-    return adminApi.delete(`/mi-negocio/productos/${id}/manage_product/`);
+    return adminApi.delete(`/mi-negocio/productos/${id}/delete_product/`);
   },
 
   getResumen() {

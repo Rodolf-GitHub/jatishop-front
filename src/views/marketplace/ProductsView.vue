@@ -149,7 +149,7 @@ onUnmounted(() => {
     <!-- Products grid -->
     <div v-else class="products-grid">
       <div
-        v-if="productos.length > 0"
+        v-if="loading || productos.length > 0"
         class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"
       >
         <MarketplaceProductCard

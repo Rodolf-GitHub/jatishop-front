@@ -69,15 +69,15 @@ onMounted(async () => {
     <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
       <div class="flex flex-col">
         <!-- Primera sección con logo y botones -->
-        <div class="flex items-center justify-between h-14 md:h-16">
+        <div class="flex items-center justify-between h-14">
           <div class="flex items-center">
-            <a href="/" class="flex items-center gap-2 ml-2 md:ml-4">
+            <a href="/" class="flex items-center gap-2">
               <img 
                 src="/logo.jpg" 
                 alt="E-comCuba" 
-                class="h-8 w-8 md:h-10 md:w-10 object-cover rounded-full"
+                class="h-8 w-8 object-cover rounded-full"
               >
-              <span class="text-lg md:text-xl font-bold">
+              <span class="text-sm sm:text-lg font-bold">
                 <span class="text-red-600">E-com</span><span class="text-blue-600">Cuba</span>
               </span>
             </a>
@@ -87,7 +87,7 @@ onMounted(async () => {
             <!-- Botón de ubicación -->
             <button
               @click="showUbicacionModal = true"
-              class="flex items-center gap-1 px-3 py-1.5 text-sm rounded-full border hover:bg-gray-50"
+              class="flex items-center gap-1 px-2 py-1.5 text-xs sm:text-sm rounded-full border hover:bg-gray-50"
               :class="ubicacionActual?.provincia ? 'border-blue-500 text-blue-600' : 'border-gray-300 text-gray-600'"
             >
               <MapPinIcon class="h-4 w-4" />
@@ -97,13 +97,14 @@ onMounted(async () => {
               <span v-else>Toda Cuba</span>
             </button>
 
-            <!-- Botón de admin existente -->
+            <!-- Botón de mi tienda -->
             <router-link
               to="/admin"
-              class="p-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all hover:scale-105"
-              title="Administración"
+              class="flex items-center gap-1 px-2 py-1.5 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all text-xs sm:text-sm"
+              title="Mi Tienda"
             >
-              <Cog6ToothIcon class="h-5 w-5" />
+              <ShoppingBagIcon class="h-4 w-4" />
+              <span>Mi Tienda</span>
             </router-link>
           </div>
         </div>
@@ -135,8 +136,6 @@ onMounted(async () => {
 
   <!-- Agregamos el InfoBanner justo después del espaciador -->
   <InfoBanner 
-    message="Actualización programada hoy a las 10:00 PM (hora de Cuba) para mejorar el rendimiento, solucionar errores y optimizar la experiencia de usuario. ¡Gracias por tu comprensión!"
-    type="info"
   />
 
   <!-- Modal de ubicación -->

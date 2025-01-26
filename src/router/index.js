@@ -6,6 +6,7 @@ import MarketplaceLayout from "../layouts/MarketplaceLayout.vue";
 import AdminLayout from "../views/admin/AdminView.vue";
 import DashboardView from "../views/admin/DashboardView.vue";
 import BusinessView from "../views/admin/BusinessView.vue";
+import ProfileView from "@/views/admin/ProfileView.vue";
 import CategoriesView from "../views/admin/CategoriesView.vue";
 import ProductsView from "../views/admin/ProductsView.vue";
 import OrdersView from "../views/admin/OrdersView.vue";
@@ -14,6 +15,7 @@ import LoginView from "@/views/auth/LoginView.vue";
 import HomeAdminView from "@/views/admin/HomeAdminView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
 import RegisterView from '@/views/auth/RegisterView.vue'
+import NewFeaturesView from "@/views/NewFeaturesView.vue";
 import { useAuth } from "@/composables/useAuth";
 
 const router = createRouter({
@@ -33,6 +35,11 @@ const router = createRouter({
           name: "login",
           component: LoginView,
           meta: { requiresGuest: true },
+        },
+        {
+          path: "/newFeatures",
+          name: "new_features",
+          component: NewFeaturesView,
         },
         {
           path: "/register",
@@ -112,6 +119,11 @@ const router = createRouter({
           path: "business",
           name: "admin-business",
           component: BusinessView,
+        },
+        {
+          path: "user_profile",
+          name: "user-profile",
+          component: ProfileView,
         },
         {
           path: "home",

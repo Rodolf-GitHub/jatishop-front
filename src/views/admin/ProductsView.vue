@@ -123,7 +123,7 @@
                       {{ product.nombre }}
                     </div>
                     <div class="text-sm text-gray-400 line-clamp-1">
-                      {{ product.descripcion || "Sin descripción" }}
+                      {{ product.descripcion ? product.descripcion.substring(0,10) + '...' : "Sin descripción" }}
                     </div>
                   </div>
                 </div>
@@ -385,20 +385,20 @@ const loadCategories = async () => {
     const response = await adminServices.getMyCategories();
     categories.value = response.data;
   } catch (error) {
+    console.error("Error al cargar categorías:", error);
     toast.error("Error al cargar las categorías");
-    console.error("Error:", error);
   }
 };
 
 // Cargar productos
 const loadProducts = async () => {
-  isLoading.value = true;
   try {
+  isLoading.value = true;
     const response = await adminServices.getMyProducts();
     products.value = response.data;
   } catch (error) {
-    console.error('Error al cargar productos:', error);
-    toast.error('Error al cargar los productos');
+    console.error("Error al cargar productos:", error);
+    toast.error("Error al cargar los productos");
   } finally {
     isLoading.value = false;
   }
@@ -506,8 +506,12 @@ watch(selectedCategory, (newValue) => {
   }
 });
 
-onMounted(() => {
-  loadCategories();
+onMounted(async () => {
+  await Promise.all([loadProducts(), loadCategories()]);
+});
+
+// Escuchar eventos de actualización
+emitter.on(EVENT_TYPES.PRODUCT_UPDATED, () => {
   loadProducts();
 });
 </script>

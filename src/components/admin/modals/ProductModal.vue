@@ -1,11 +1,11 @@
 <template>
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
     <div class="min-h-[calc(100vh-2rem)] flex items-center justify-center py-8">
-      <div class="bg-gray-800 rounded-xl w-full max-w-2xl relative">
-        <!-- Header (fijo) -->
+      <div class="bg-gray-800 rounded-xl w-full max-w-5xl relative">
+        <!-- Header -->
         <div class="sticky top-0 bg-gray-800 p-6 border-b border-gray-700 rounded-t-xl z-10">
           <div class="flex items-center justify-between">
-            <h3 class="text-lg font-medium text-white">
+            <h3 class="text-xl font-medium text-white">
               {{ props.editingProduct ? "Editar Producto" : "Nuevo Producto" }}
             </h3>
             <button
@@ -18,45 +18,74 @@
         </div>
 
         <!-- Contenido con scroll -->
-        <div class="max-h-[calc(100vh-16rem)] overflow-y-auto">
-          <form @submit.prevent="handleSubmit">
+        <div class="max-h-[calc(100vh-12rem)] overflow-y-auto">
+          <form @submit.prevent="handleSubmit" class="h-full">
             <div class="p-6 space-y-6">
-              <!-- Imagen -->
+              <!-- Nombre -->
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Imagen del Producto
+                  Nombre*
                 </label>
-                <div class="flex items-center gap-4">
-                  <div
-                    class="w-32 h-32 rounded-lg bg-gray-700 flex items-center justify-center overflow-hidden"
-                  >
-                    <img
-                      v-if="imagePreview"
-                      :src="imagePreview"
-                      alt="Preview"
-                      class="w-full h-full object-cover"
-                    />
-                    <PhotoIcon v-else class="w-12 h-12 text-gray-500" />
-                  </div>
+                <input
+                  v-model="form.nombre"
+                  type="text"
+                  required
+                  class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
+                />
+              </div>
+
+              <!-- Precios y Stock en grid responsivo -->
+              <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                    Precio*
+                  </label>
                   <input
-                    type="file"
-                    ref="imageInput"
-                    @change="handleImageUpload"
-                    accept="image/*"
-                    class="hidden"
+                    v-model="form.precio"
+                    type="number"
+                    step="0.01"
+                    required
+                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
                   />
-                  <button
-                    type="button"
-                    @click="$refs.imageInput.click()"
-                    class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
-                  >
-                    Seleccionar Imagen
-                  </button>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                    Descuento (%)
+                  </label>
+                  <input
+                    v-model="form.descuento"
+                    type="number"
+                    min="0"
+                    max="99"
+                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                    Precio final
+                  </label>
+                  <div class="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-green-400">
+                    ${{ precioConDescuento }}
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                    Stock*
+                  </label>
+                  <input
+                    v-model="form.stock"
+                    type="number"
+                    required
+                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
+                  />
                 </div>
               </div>
 
               <!-- Categoría y Subcategoría -->
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-300 mb-2">
                     Categoría*
@@ -98,62 +127,6 @@
                 </div>
               </div>
 
-              <!-- Nombre y Precio -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-300 mb-2">
-                    Nombre*
-                  </label>
-                  <input
-                    v-model="form.nombre"
-                    type="text"
-                    required
-                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-gray-300 mb-2">
-                    Precio*
-                  </label>
-                  <input
-                    v-model="form.precio"
-                    type="number"
-                    step="0.01"
-                    required
-                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
-                  />
-                </div>
-              </div>
-
-              <!-- Stock y Descuento -->
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-300 mb-2">
-                    Stock*
-                  </label>
-                  <input
-                    v-model="form.stock"
-                    type="number"
-                    required
-                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-gray-300 mb-2">
-                    Descuento (%)
-                  </label>
-                  <input
-                    v-model="form.descuento"
-                    type="number"
-                    min="0"
-                    max="99"
-                    class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-200"
-                  />
-                </div>
-              </div>
-
               <!-- Descripción -->
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">
@@ -166,6 +139,45 @@
                 ></textarea>
               </div>
 
+              <!-- Imagen -->
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  Imagen del Producto
+                </label>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div
+                    class="w-32 h-32 rounded-lg bg-gray-700 flex items-center justify-center overflow-hidden"
+                  >
+                    <img
+                      v-if="imagePreview"
+                      :src="imagePreview"
+                      alt="Preview"
+                      class="w-full h-full object-cover"
+                    />
+                    <PhotoIcon v-else class="w-12 h-12 text-gray-500" />
+                  </div>
+                  <div class="flex flex-col gap-2 flex-grow">
+                    <input
+                      type="file"
+                      ref="imageInput"
+                      @change="handleImageUpload"
+                      accept="image/*"
+                      class="hidden"
+                    />
+                    <button
+                      type="button"
+                      @click="$refs.imageInput.click()"
+                      class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 w-full sm:w-auto"
+                    >
+                      Seleccionar Imagen
+                    </button>
+                    <p class="text-sm text-gray-400">
+                      Formatos permitidos: BMP, EPS, GIF, ICNS, ICO, IM, JPEG, JPG, MSP, PCX, PNG, PPM, SGI, SPIDER, TGA, TIFF, WebP. Tamaño máximo: 100MB
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <!-- Estado -->
               <div class="flex items-center">
                 <input
@@ -175,22 +187,21 @@
                 />
                 <label class="ml-2 text-sm text-gray-300">Producto activo</label>
               </div>
-            </div>
 
-            <!-- Footer (fijo) -->
-            <div class="sticky bottom-0 bg-gray-800 p-6 border-t border-gray-700 rounded-b-xl">
-              <div class="flex justify-end gap-3">
+              <!-- Botones de acción -->
+              <div class="flex flex-col sm:flex-row justify-end gap-3 pt-4">
                 <button
                   type="button"
                   @click="emit('close')"
-                  class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600"
+                  class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 w-full sm:w-auto"
+                  :disabled="isSubmitting"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  :disabled="isSubmitting"
+                  class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full sm:w-auto"
+                  :disabled="isSubmitting || !isFormValid"
                 >
                   <div v-if="isSubmitting" class="flex items-center gap-2">
                     <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -244,7 +255,6 @@ const form = ref({
   precio: "",
   stock: "",
   imagen: null,
-  subcategoria: null,
   descuento: 0,
   activo: true,
 });
@@ -253,6 +263,20 @@ const form = ref({
 const selectedCategorySubcategories = computed(() => {
   if (!selectedCategory.value) return [];
   return selectedCategory.value.subcategorias || [];
+});
+
+const isFormValid = computed(() => {
+  return form.value.nombre?.trim() && 
+         form.value.precio > 0 && 
+         form.value.stock >= 0 && 
+         selectedSubcategory.value;
+});
+
+const precioConDescuento = computed(() => {
+  const precio = parseFloat(form.value.precio) || 0;
+  const descuento = parseFloat(form.value.descuento) || 0;
+  const precioFinal = precio - (precio * descuento / 100);
+  return precioFinal.toFixed(2);
 });
 
 const handleImageUpload = (event) => {
@@ -274,31 +298,32 @@ const handleSubmit = async () => {
       return;
     }
 
+    if (!isFormValid.value) {
+      toast.error("Por favor completa todos los campos requeridos");
+      return;
+    }
+
     isSubmitting.value = true;
     const formData = new FormData();
+
+    formData.append("nombre", form.value.nombre.trim());
     formData.append("subcategoria", selectedSubcategory.value);
-    formData.append("nombre", form.value.nombre);
-    formData.append("descripcion", form.value.descripcion || "");
-    formData.append("precio", form.value.precio.toString());
-    formData.append("stock", form.value.stock.toString());
-    formData.append("descuento", (form.value.descuento || 0).toString());
+    formData.append("precio", parseFloat(form.value.precio).toString());
+    formData.append("stock", parseInt(form.value.stock).toString());
+    formData.append("descripcion", form.value.descripcion?.trim() || "");
+    formData.append("descuento", (parseInt(form.value.descuento) || 0).toString());
     formData.append("activo", form.value.activo.toString());
 
-    if (form.value.imagen) {
+    // Solo agregar imagen si hay una nueva
+    if (form.value.imagen instanceof File) {
       formData.append("imagen", form.value.imagen);
     }
 
-    // Log de los datos que se envían
-    console.log('Datos enviados al backend:', {
-      subcategoria: selectedSubcategory.value,
-      nombre: form.value.nombre,
-      descripcion: form.value.descripcion,
-      precio: form.value.precio,
-      stock: form.value.stock,
-      descuento: form.value.descuento,
-      activo: form.value.activo,
-      imagen: form.value.imagen ? 'Imagen presente' : 'Sin imagen'
-    });
+    // Debug - Ver contenido del FormData
+    console.log("DEBUG - FormData antes de enviar:");
+    for (let pair of formData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
 
     if (props.editingProduct) {
       await adminServices.updateProduct(props.editingProduct.id, formData);
@@ -311,47 +336,29 @@ const handleSubmit = async () => {
     emit('saved');
     emitter.emit(EVENT_TYPES.PRODUCT_UPDATED);
   } catch (error) {
-    console.error("Error al guardar el producto:", error);
+    console.error("DEBUG - Error completo:", error);
+    console.error("DEBUG - Response data:", error.response?.data);
 
     if (error.response?.data) {
       const errorData = error.response.data;
       
-      if (errorData.subcategoria) {
-        toast.error("Debes seleccionar una subcategoría válida");
-      }
-      else if (errorData.nombre) {
-        if (Array.isArray(errorData.nombre)) {
-          toast.error(errorData.nombre[0]);
+      if (typeof errorData === 'string') {
+        toast.error(errorData);
+      } else if (errorData.detail) {
+        toast.error(errorData.detail);
+      } else {
+        // Manejar errores específicos de campos
+        const firstError = Object.entries(errorData)[0];
+        if (firstError) {
+          const [field, messages] = firstError;
+          const message = Array.isArray(messages) ? messages[0] : messages;
+          toast.error(`${field}: ${message}`);
         } else {
-          toast.error(errorData.nombre);
+          toast.error("Error al guardar el producto");
         }
       }
-      else if (errorData.precio) {
-        toast.error(Array.isArray(errorData.precio) 
-          ? errorData.precio[0] 
-          : "El precio debe ser un número válido");
-      }
-      else if (errorData.stock) {
-        toast.error(Array.isArray(errorData.stock) 
-          ? errorData.stock[0] 
-          : "El stock debe ser un número válido");
-      }
-      else if (errorData.descuento) {
-        toast.error(Array.isArray(errorData.descuento) 
-          ? errorData.descuento[0] 
-          : "El descuento debe ser un número válido entre 0 y 100");
-      }
-      else if (errorData.imagen) {
-        toast.error(Array.isArray(errorData.imagen) 
-          ? errorData.imagen[0] 
-          : "Error con la imagen del producto");
-      }
-      else if (typeof errorData === 'string') {
-        toast.error(errorData);
-      }
-      else {
-        toast.error("Error al guardar el producto. Por favor, verifica los datos");
-      }
+    } else if (error.message) {
+      toast.error(error.message);
     } else {
       toast.error("Error al guardar el producto");
     }
@@ -360,11 +367,16 @@ const handleSubmit = async () => {
   }
 };
 
+
 // Watch para cargar datos cuando se está editando
 watch(() => props.editingProduct, (product) => {
   if (product) {
-    selectedCategory.value = product.subcategoria.categoria;
-    selectedSubcategory.value = product.subcategoria.id;
+    // Primero seleccionamos la categoría completa, no solo el ID
+    selectedCategory.value = product.categoria?.id;
+    
+    // Luego seleccionamos la subcategoría
+    selectedSubcategory.value = product.subcategoria?.id;
+    
     form.value = {
       nombre: product.nombre || "",
       descripcion: product.descripcion || "",
@@ -374,9 +386,31 @@ watch(() => props.editingProduct, (product) => {
       descuento: product.descuento || 0,
       activo: typeof product.activo === "boolean" ? product.activo : true,
     };
+    
     if (product.imagen) {
       imagePreview.value = product.imagen;
     }
   }
 }, { immediate: true });
 </script> 
+
+<style scoped>
+/* Estilos para mejorar el scroll */
+.overflow-y-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #4B5563 #1F2937;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: #1F2937;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #4B5563;
+  border-radius: 4px;
+}
+</style> 

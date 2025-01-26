@@ -1,14 +1,31 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { services } from '@/services/api'
 import { getImageUrl } from '@/utils/image'
 import { useMarketplaceStore } from '@/stores/marketplace'
-import { MapPinIcon, PhoneIcon, EnvelopeIcon, ClockIcon } from '@heroicons/vue/24/outline'
+import { 
+  MapPinIcon, 
+  PhoneIcon, 
+  ClockIcon,
+  ShoppingBagIcon,
+  TagIcon,
+  ArrowRightIcon
+} from '@heroicons/vue/24/outline'
 
 const stores = ref([])
 const loading = ref(true)
 const error = ref(null)
 const marketplaceStore = useMarketplaceStore()
+
+// Computed property para ordenar las tiendas y filtrar las que no tienen productos
+const sortedStores = computed(() => {
+  return [...stores.value]
+    .filter(store => store.cantidad_productos > 0)
+    .sort((a, b) => {
+    // Ordenar por cantidad_productos de mayor a menor
+    return b.cantidad_productos - a.cantidad_productos;
+  });
+});
 
 const getStoreImageUrl = (url) => {
   if (!url) return '/no-image.png';
@@ -81,24 +98,31 @@ onMounted(() => {
       <!-- Stores grid -->
       <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <router-link
-          v-for="store in stores"
+          v-for="store in sortedStores"
           :key="store.id"
           :to="`/store/${store.slug}`"
-          class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group flex flex-col"
           :style="{
-            '--store-primary': store.tema?.color_primario || '#12AD07',
-            '--store-secondary': store.tema?.color_secundario || '#3817E6'
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            borderImage: `linear-gradient(45deg, ${store.tema?.color_primario || '#12AD07'}, ${store.tema?.color_secundario || '#3817E6'}) 1`,
+            boxShadow: 'var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)'
           }"
+          class="bg-white rounded-2xl overflow-hidden group flex flex-col relative transition-all duration-300 hover:scale-[1.02]"
         >
           <!-- Banner y Logo -->
-          <div class="relative h-48">
+          <div class="relative h-60">
             <img
               :src="store.img_portada || '/no-image.png'"
               class="w-full h-full object-cover"
               alt=""
               @error="$event.target.src = '/no-image.png'"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <div 
+              class="absolute inset-0" 
+              :style="{
+                background: `linear-gradient(to bottom, transparent, ${store.tema?.color_primario}99)`
+              }"
+            ></div>
             <div class="absolute -bottom-12 left-6">
               <img
                 :src="getImageUrl(store.logo)"
@@ -107,11 +131,21 @@ onMounted(() => {
                 @error="$event.target.src = '/no-image.png'"
               />
             </div>
+            <!-- Badge de productos -->
+            <div class="absolute top-4 right-4 flex items-center gap-2">
+              <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium bg-white/90 shadow-lg">
+                <ShoppingBagIcon class="w-4 h-4" :style="{ color: store.tema?.color_primario }" />
+                <span :style="{ color: store.tema?.color_primario }">{{ store.cantidad_productos }} productos</span>
+              </div>
+            </div>
           </div>
           
           <!-- Información de la tienda -->
           <div class="p-6 pt-16 flex-1">
-            <h2 class="text-2xl font-bold text-gray-900 group-hover:text-[var(--store-primary)] transition-colors">
+            <h2 
+              class="text-2xl font-bold transition-colors"
+              :style="{ color: store.tema?.color_primario }"
+            >
               {{ store.nombre }}
             </h2>
             <p v-if="store.descripcion" class="text-gray-600 mt-3 line-clamp-2">
@@ -136,12 +170,30 @@ onMounted(() => {
           </div>
 
           <!-- Footer con estadísticas -->
-          <div class="px-6 py-4 border-t border-gray-100 bg-gray-50/50 mt-auto">
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-gray-600 font-medium">Visitar tienda</span>
-              <div class="flex items-center gap-4 text-gray-500">
-                <span v-if="store.productos_count">{{ store.productos_count }} productos</span>
-                <span v-if="store.categorias_count">{{ store.categorias_count }} categorías</span>
+          <div 
+            class="px-6 py-4 mt-auto border-t"
+            :style="{
+              borderColor: `${store.tema?.color_primario}22`,
+              background: `linear-gradient(to right, ${store.tema?.color_primario}11, ${store.tema?.color_secundario}11)`
+            }"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2" :style="{ color: store.tema?.color_primario }">
+                <span class="font-medium">Visitar tienda</span>
+                <ArrowRightIcon class="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+
+              <div class="flex items-center gap-2">
+                <div v-if="store.categorias_count"
+                  class="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium"
+                  :style="{
+                    backgroundColor: `${store.tema?.color_secundario}22`,
+                    color: store.tema?.color_secundario
+                  }"
+                >
+                  <TagIcon class="w-4 h-4" />
+                  <span>{{ store.categorias_count }} categorías</span>
+                </div>
               </div>
             </div>
           </div>

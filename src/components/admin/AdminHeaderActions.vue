@@ -47,12 +47,12 @@
         class="absolute right-0 top-full mt-2 w-48 py-2 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50"
       >
         <a
-          @click="handleLogout"
-          href="#"
+          href="/admin/user_profile"
           class="flex items-center gap-3 px-4 py-2 text-gray-300 hover:bg-gray-700"
         >
           <UserIcon class="w-5 h-5" />
           <span>Mi Perfil</span>
+          
         </a>
         <!-- <a
           @click="handleLogout"
