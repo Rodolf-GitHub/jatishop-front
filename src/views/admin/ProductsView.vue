@@ -205,17 +205,9 @@
       </div>
 
       <!-- Paginación -->
-      <div
-        class="px-6 py-4 border-t border-gray-700 flex items-center justify-between"
-      >
-        <div class="text-sm text-gray-400">
-          Mostrando
-          {{ Math.min((currentPage - 1) * itemsPerPage + 1, totalItems) }} a
-          {{ Math.min(currentPage * itemsPerPage, totalItems) }} de
-          {{ totalItems }} productos
-        </div>
-
-        <div class="flex gap-2">
+      <div class="px-6 py-4 border-t border-gray-700 flex flex-col gap-4">
+        <!-- Botones de paginación -->
+        <div class="flex justify-center gap-2">
           <!-- Botón Anterior -->
           <button
             @click="changePage(currentPage - 1)"
@@ -264,6 +256,14 @@
           >
             Siguiente
           </button>
+        </div>
+
+        <!-- Texto informativo -->
+        <div class="text-sm text-gray-400 text-center">
+          Mostrando
+          {{ Math.min((currentPage - 1) * itemsPerPage + 1, totalItems) }} a
+          {{ Math.min(currentPage * itemsPerPage, totalItems) }} de
+          {{ totalItems }} productos
         </div>
       </div>
     </div>

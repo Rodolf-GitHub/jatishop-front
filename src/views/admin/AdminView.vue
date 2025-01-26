@@ -1,17 +1,17 @@
 <template>
   <div class="flex min-h-screen bg-gray-900">
     <!-- Overlay para móvil -->
-    <div 
+    <div
       v-if="showMobileMenu"
       class="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
       @click="toggleMobileMenu"
     ></div>
 
     <!-- Sidebar -->
-    <div 
+    <div
       :class="[
         'fixed md:static z-30',
-        showMobileMenu ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        showMobileMenu ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
       ]"
       class="transition-transform duration-300"
     >
@@ -21,7 +21,7 @@
     <main class="flex-1 min-w-0 h-screen overflow-y-auto">
       <!-- Header con botón de menú -->
       <div class="sticky top-0 z-10">
-        <button 
+        <button
           @click="toggleMobileMenu"
           class="md:hidden absolute left-4 top-4 text-white p-2"
         >
@@ -39,8 +39,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Bars3Icon } from '@heroicons/vue/24/outline';
+import { ref } from "vue";
+import { Bars3Icon } from "@heroicons/vue/24/outline";
 import AdminSidebar from "@/components/admin/AdminSidebar.vue";
 import AdminHeader from "@/components/admin/AdminHeader.vue";
 

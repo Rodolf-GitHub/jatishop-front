@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 flex items-center justify-center p-4">
-    <div class="text-center max-w-lg mx-auto bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
+  <div
+    class="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 flex items-center justify-center p-4"
+  >
+    <div
+      class="text-center max-w-lg mx-auto bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20"
+    >
       <!-- Logo EcomCuba -->
-      <img
-        src="/logo.jpg"
-        alt="EcomCuba Logo"
-        class="w-24 h-24 mx-auto mb-6"
-      />
+      <img src="/logo.jpg" alt="EcomCuba Logo" class="w-24 h-24 mx-auto mb-6" />
 
       <!-- Icono de Error -->
       <div class="mb-6">
@@ -54,7 +54,8 @@
 
       <!-- Texto adicional -->
       <p class="mt-8 text-blue-200 text-sm">
-        Si crees que esto es un error, por favor contacta con nuestro equipo de soporte
+        Si crees que esto es un error, por favor contacta con nuestro equipo de
+        soporte
       </p>
     </div>
   </div>
@@ -73,4 +74,4 @@
 
 <script setup>
 // No se necesita lógica adicional
-</script> 
+</script>

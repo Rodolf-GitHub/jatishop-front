@@ -9,4 +9,4 @@ import MarketplaceNavBar from "@/components/navigation/MarketplaceNavBar.vue";
       <router-view></router-view>
     </main>
   </div>
-</template> 
+</template>

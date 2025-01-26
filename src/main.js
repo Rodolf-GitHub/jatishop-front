@@ -8,7 +8,7 @@ import App from "./App.vue";
 import router from "./router";
 import Toast from "vue-toastification/dist/index.mjs";
 import "vue-toastification/dist/index.css";
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
 
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
@@ -19,18 +19,18 @@ app.use(pinia);
 app.use(router);
 
 const options = {
-    position: "top-right",
-    timeout: 5000,
-    closeOnClick: true,
-    pauseOnFocusLoss: true,
-    pauseOnHover: true,
-    draggable: true,
-    draggablePercent: 0.6,
-    showCloseButtonOnHover: false,
-    hideProgressBar: true,
-    closeButton: "button",
-    icon: true,
-    rtl: false
+  position: "top-right",
+  timeout: 5000,
+  closeOnClick: true,
+  pauseOnFocusLoss: true,
+  pauseOnHover: true,
+  draggable: true,
+  draggablePercent: 0.6,
+  showCloseButtonOnHover: false,
+  hideProgressBar: true,
+  closeButton: "button",
+  icon: true,
+  rtl: false,
 };
 
 app.use(Toast, options);

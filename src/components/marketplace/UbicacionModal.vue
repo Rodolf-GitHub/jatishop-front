@@ -1,35 +1,35 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import { services } from '@/services/api';
-import UbicacionSelector from '@/components/common/UbicacionSelector.vue';
-import { MapPinIcon } from '@heroicons/vue/24/outline';
+import { ref, onMounted } from "vue";
+import { services } from "@/services/api";
+import UbicacionSelector from "@/components/common/UbicacionSelector.vue";
+import { MapPinIcon } from "@heroicons/vue/24/outline";
 
 const props = defineProps({
-  show: Boolean
+  show: Boolean,
 });
 
-const emit = defineEmits(['close', 'update-ubicacion']);
+const emit = defineEmits(["close", "update-ubicacion"]);
 
 const ubicacion = ref({
-  provincia: '',
-  municipio: ''
+  provincia: "",
+  municipio: "",
 });
 
 const guardarUbicacion = () => {
-  localStorage.setItem('ubicacion', JSON.stringify(ubicacion.value));
-  emit('update-ubicacion', ubicacion.value);
-  emit('close');
+  localStorage.setItem("ubicacion", JSON.stringify(ubicacion.value));
+  emit("update-ubicacion", ubicacion.value);
+  emit("close");
 };
 
 const limpiarUbicacion = () => {
-  localStorage.removeItem('ubicacion');
-  ubicacion.value = { provincia: '', municipio: '' };
-  emit('update-ubicacion', ubicacion.value);
-  emit('close');
+  localStorage.removeItem("ubicacion");
+  ubicacion.value = { provincia: "", municipio: "" };
+  emit("update-ubicacion", ubicacion.value);
+  emit("close");
 };
 
 onMounted(() => {
-  const savedUbicacion = localStorage.getItem('ubicacion');
+  const savedUbicacion = localStorage.getItem("ubicacion");
   if (savedUbicacion) {
     ubicacion.value = JSON.parse(savedUbicacion);
   }
@@ -37,8 +37,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="show" 
-       class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+  <div
+    v-if="show"
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+  >
     <div class="bg-white rounded-lg p-6 max-w-md w-full" @click.stop>
       <div class="flex items-center gap-2 mb-6">
         <MapPinIcon class="h-6 w-6 text-blue-600" />
@@ -64,4 +66,4 @@ onMounted(() => {
       </div>
     </div>
   </div>
-</template> 
+</template>

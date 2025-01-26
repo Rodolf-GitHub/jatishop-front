@@ -33,7 +33,9 @@
       </div>
 
       <!-- Card con Formulario -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+      <div
+        class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
+      >
         <div class="p-6 md:p-8">
           <form @submit.prevent="handleRegister" class="space-y-5">
             <div class="grid grid-cols-2 gap-4">
@@ -172,21 +174,24 @@ const registerForm = ref({
 
 const rules = {
   registerForm: {
-    username: { 
-      required: helpers.withMessage("El nombre de usuario es requerido", required),
+    username: {
+      required: helpers.withMessage(
+        "El nombre de usuario es requerido",
+        required,
+      ),
       minLength: helpers.withMessage(
         "El nombre de usuario debe tener al menos 3 caracteres",
-        minLength(3)
+        minLength(3),
       ),
     },
     password: {
       required: helpers.withMessage("La contraseña es requerida", required),
       minLength: helpers.withMessage(
         "La contraseña debe tener al menos 6 caracteres",
-        minLength(6)
+        minLength(6),
       ),
     },
-  }
+  },
 };
 
 const v$ = useVuelidate(rules, { registerForm });
@@ -212,7 +217,7 @@ const handleRegister = async () => {
     });
 
     toast.success("Cuenta creada exitosamente");
-    
+
     registerForm.value = {
       username: "",
       firstName: "",
@@ -222,8 +227,7 @@ const handleRegister = async () => {
       confirmPassword: "",
     };
 
-    router.push('/login');
-
+    router.push("/login");
   } catch (err) {
     console.error("Error en registro:", err);
     if (err.response?.data) {
@@ -237,8 +241,9 @@ const handleRegister = async () => {
         errorMessage.value = err.response.data;
       }
     } else {
-      errorMessage.value = "Error al crear la cuenta. Por favor, intente nuevamente.";
+      errorMessage.value =
+        "Error al crear la cuenta. Por favor, intente nuevamente.";
     }
   }
 };
-</script> 
+</script>

@@ -8,9 +8,9 @@ import {
   XMarkIcon,
   TrashIcon,
 } from "@heroicons/vue/24/outline";
-import { useRouter, useRoute } from 'vue-router'
-import CheckoutModal from './CheckoutModal.vue'
-import IconWhatsApp from '@/components/icons/IconWhatsApp.vue'
+import { useRouter, useRoute } from "vue-router";
+import CheckoutModal from "./CheckoutModal.vue";
+import IconWhatsApp from "@/components/icons/IconWhatsApp.vue";
 
 const cartStore = useCartStore();
 const showCart = ref(false);
@@ -18,7 +18,7 @@ const showCheckoutModal = ref(false);
 const infoNegocio = ref(null);
 const router = useRouter();
 const route = useRoute();
-const errorMessage = ref('');
+const errorMessage = ref("");
 
 const totalItems = computed(() => cartStore.totalItems);
 const totalAmount = computed(() => cartStore.totalAmount);
@@ -43,7 +43,7 @@ const updateQuantity = (producto, cantidad) => {
     } else {
       cartStore.updateQuantity(producto.id, cantidad);
     }
-    errorMessage.value = '';
+    errorMessage.value = "";
   } catch (error) {
     errorMessage.value = error.message;
   }
@@ -61,7 +61,7 @@ const handleEscKey = (event) => {
 };
 
 const generateWhatsAppLink = () => {
-  if (!infoNegocio.value?.whatsapp) return '#';
+  if (!infoNegocio.value?.whatsapp) return "#";
   return `${infoNegocio.value.whatsapp}`;
 };
 
@@ -126,7 +126,9 @@ onUnmounted(() => {
       <div class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl">
         <div class="flex flex-col h-full">
           <!-- Encabezado -->
-          <div class="flex items-center justify-between p-4 bg-gradient-to-r from-jati to-shop text-white">
+          <div
+            class="flex items-center justify-between p-4 bg-gradient-to-r from-jati to-shop text-white"
+          >
             <h2 class="text-xl font-bold">Carrito de Compras</h2>
             <div class="flex items-center gap-2">
               <button
@@ -156,7 +158,10 @@ onUnmounted(() => {
 
           <!-- Lista de productos -->
           <div class="flex-1 overflow-y-auto p-4">
-            <div v-if="!cartStore.items.length" class="text-center text-gray-500 py-8">
+            <div
+              v-if="!cartStore.items.length"
+              class="text-center text-gray-500 py-8"
+            >
               El carrito está vacío
             </div>
             <div v-else class="space-y-4">
@@ -174,8 +179,13 @@ onUnmounted(() => {
                 <div class="flex-1">
                   <h3 class="font-medium">{{ item.producto.nombre }}</h3>
                   <p class="text-sm text-gray-600">
-                    Precio: ${{ item.producto.precio_con_descuento || 
-                      (item.producto.precio * (1 - item.producto.descuento/100)).toFixed(2) }}
+                    Precio: ${{
+                      item.producto.precio_con_descuento ||
+                      (
+                        item.producto.precio *
+                        (1 - item.producto.descuento / 100)
+                      ).toFixed(2)
+                    }}
                   </p>
                   <div class="flex items-center gap-2 mt-2">
                     <button
@@ -227,7 +237,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Modal de checkout -->
-    <CheckoutModal 
+    <CheckoutModal
       :show-modal="showCheckoutModal"
       :info-negocio="infoNegocio"
       :cart-items="cartStore.items"
@@ -239,11 +249,13 @@ onUnmounted(() => {
 
 <style scoped>
 /* Añadir animación de hover suave */
-a, button {
+a,
+button {
   transition: all 0.2s ease-in-out;
 }
 
-a:hover, button:hover {
+a:hover,
+button:hover {
   transform: scale(1.05);
 }
 </style>

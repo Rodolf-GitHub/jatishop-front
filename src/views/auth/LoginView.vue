@@ -33,7 +33,9 @@
       </div>
 
       <!-- Card con Formulario -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+      <div
+        class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden"
+      >
         <div class="p-6 md:p-8">
           <form @submit.prevent="handleLogin" class="space-y-5">
             <div>
@@ -111,7 +113,10 @@ const loginForm = ref({
 const rules = {
   loginForm: {
     email: {
-      required: helpers.withMessage("El nombre de usuario es requerido", required),
+      required: helpers.withMessage(
+        "El nombre de usuario es requerido",
+        required,
+      ),
     },
     password: {
       required: helpers.withMessage("La contraseña es requerida", required),
@@ -134,11 +139,14 @@ const handleLogin = async () => {
     });
   } catch (err) {
     if (err?.status === 400) {
-      errorMessage.value = "Credenciales inválidas. Por favor, verifica tu usuario y contraseña.";
+      errorMessage.value =
+        "Credenciales inválidas. Por favor, verifica tu usuario y contraseña.";
     } else if (err?.status === 401) {
-      errorMessage.value = "No autorizado. Por favor, inicia sesión nuevamente.";
+      errorMessage.value =
+        "No autorizado. Por favor, inicia sesión nuevamente.";
     } else {
-      errorMessage.value = "Ha ocurrido un error. Por favor, intenta nuevamente más tarde.";
+      errorMessage.value =
+        "Ha ocurrido un error. Por favor, intenta nuevamente más tarde.";
     }
     console.error(err);
   }

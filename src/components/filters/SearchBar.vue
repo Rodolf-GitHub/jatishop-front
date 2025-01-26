@@ -20,7 +20,9 @@ const handleSearch = () => {
         placeholder="Buscar por nombre..."
         @input="handleSearch"
       />
-      <div class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
+      <div
+        class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+      >
         <MagnifyingGlassIcon class="h-5 w-5" />
       </div>
     </div>

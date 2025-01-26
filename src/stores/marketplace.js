@@ -1,17 +1,17 @@
-import { defineStore } from 'pinia';
-import { services } from '@/services/api';
+import { defineStore } from "pinia";
+import { services } from "@/services/api";
 
-export const useMarketplaceStore = defineStore('marketplace', {
+export const useMarketplaceStore = defineStore("marketplace", {
   state: () => ({
     products: [],
     stores: [],
     loading: false,
     filters: {
-      provincia: '',
-      municipio: '',
-      search: '',
+      provincia: "",
+      municipio: "",
+      search: "",
       // ... otros filtros existentes ...
-    }
+    },
   }),
 
   actions: {
@@ -26,7 +26,7 @@ export const useMarketplaceStore = defineStore('marketplace', {
         const response = await services.getMarketplaceProducts(this.filters);
         this.products = response.data;
       } catch (error) {
-        console.error('Error loading products:', error);
+        console.error("Error loading products:", error);
       } finally {
         this.loading = false;
       }
@@ -38,10 +38,10 @@ export const useMarketplaceStore = defineStore('marketplace', {
         const response = await services.getStores(this.filters);
         this.stores = response.data;
       } catch (error) {
-        console.error('Error loading stores:', error);
+        console.error("Error loading stores:", error);
       } finally {
         this.loading = false;
       }
-    }
-  }
-}); 
+    },
+  },
+});

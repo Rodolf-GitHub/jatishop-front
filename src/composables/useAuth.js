@@ -18,7 +18,7 @@ export function useAuth() {
       user.value = null;
       return false;
     }
-    
+
     token.value = storedToken;
     return true;
   };
@@ -47,13 +47,11 @@ export function useAuth() {
       const response = await adminServices.register(userData);
       return response;
     } catch (err) {
-      console.error('Error en registro:', err);
+      console.error("Error en registro:", err);
       if (err.response?.data) {
         const errorData = err.response.data;
-        if (typeof errorData === 'object') {
-          const errorMessages = Object.values(errorData)
-            .flat()
-            .join('. ');
+        if (typeof errorData === "object") {
+          const errorMessages = Object.values(errorData).flat().join(". ");
           error.value = errorMessages;
         } else {
           error.value = errorData;

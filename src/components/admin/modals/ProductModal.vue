@@ -1,9 +1,13 @@
 <template>
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto"
+  >
     <div class="min-h-[calc(100vh-2rem)] flex items-center justify-center py-8">
       <div class="bg-gray-800 rounded-xl w-full max-w-5xl relative">
         <!-- Header -->
-        <div class="sticky top-0 bg-gray-800 p-6 border-b border-gray-700 rounded-t-xl z-10">
+        <div
+          class="sticky top-0 bg-gray-800 p-6 border-b border-gray-700 rounded-t-xl z-10"
+        >
           <div class="flex items-center justify-between">
             <h3 class="text-xl font-medium text-white">
               {{ props.editingProduct ? "Editar Producto" : "Nuevo Producto" }}
@@ -66,7 +70,9 @@
                   <label class="block text-sm font-medium text-gray-300 mb-2">
                     Precio final
                   </label>
-                  <div class="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-green-400">
+                  <div
+                    class="px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-green-400"
+                  >
                     ${{ precioConDescuento }}
                   </div>
                 </div>
@@ -144,7 +150,9 @@
                 <label class="block text-sm font-medium text-gray-300 mb-2">
                   Imagen del Producto
                 </label>
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div
+                  class="flex flex-col sm:flex-row items-start sm:items-center gap-4"
+                >
                   <div
                     class="w-32 h-32 rounded-lg bg-gray-700 flex items-center justify-center overflow-hidden"
                   >
@@ -172,7 +180,9 @@
                       Seleccionar Imagen
                     </button>
                     <p class="text-sm text-gray-400">
-                      Formatos permitidos: BMP, EPS, GIF, ICNS, ICO, IM, JPEG, JPG, MSP, PCX, PNG, PPM, SGI, SPIDER, TGA, TIFF, WebP. Tamaño máximo: 100MB
+                      Formatos permitidos: BMP, EPS, GIF, ICNS, ICO, IM, JPEG,
+                      JPG, MSP, PCX, PNG, PPM, SGI, SPIDER, TGA, TIFF, WebP.
+                      Tamaño máximo: 100MB
                     </p>
                   </div>
                 </div>
@@ -185,7 +195,9 @@
                   type="checkbox"
                   class="w-4 h-4 text-indigo-600 border-gray-600 rounded focus:ring-indigo-500"
                 />
-                <label class="ml-2 text-sm text-gray-300">Producto activo</label>
+                <label class="ml-2 text-sm text-gray-300"
+                  >Producto activo</label
+                >
               </div>
 
               <!-- Botones de acción -->
@@ -204,9 +216,25 @@
                   :disabled="isSubmitting || !isFormValid"
                 >
                   <div v-if="isSubmitting" class="flex items-center gap-2">
-                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    <svg
+                      class="animate-spin h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      />
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
                     <span>Procesando...</span>
                   </div>
@@ -228,20 +256,20 @@ import { ref, computed, watch } from "vue";
 import { useToast } from "vue-toastification";
 import { adminServices } from "@/services/admin";
 import { XMarkIcon, PhotoIcon } from "@heroicons/vue/24/outline";
-import { emitter, EVENT_TYPES } from '@/utils/eventBus';
+import { emitter, EVENT_TYPES } from "@/utils/eventBus";
 
 const props = defineProps({
   editingProduct: {
     type: Object,
-    default: null
+    default: null,
   },
   categories: {
     type: Array,
-    required: true
-  }
+    required: true,
+  },
 });
 
-const emit = defineEmits(['close', 'saved']);
+const emit = defineEmits(["close", "saved"]);
 
 const toast = useToast();
 const selectedCategory = ref(null);
@@ -266,16 +294,18 @@ const selectedCategorySubcategories = computed(() => {
 });
 
 const isFormValid = computed(() => {
-  return form.value.nombre?.trim() && 
-         form.value.precio > 0 && 
-         form.value.stock >= 0 && 
-         selectedSubcategory.value;
+  return (
+    form.value.nombre?.trim() &&
+    form.value.precio > 0 &&
+    form.value.stock >= 0 &&
+    selectedSubcategory.value
+  );
 });
 
 const precioConDescuento = computed(() => {
   const precio = parseFloat(form.value.precio) || 0;
   const descuento = parseFloat(form.value.descuento) || 0;
-  const precioFinal = precio - (precio * descuento / 100);
+  const precioFinal = precio - (precio * descuento) / 100;
   return precioFinal.toFixed(2);
 });
 
@@ -311,7 +341,10 @@ const handleSubmit = async () => {
     formData.append("precio", parseFloat(form.value.precio).toString());
     formData.append("stock", parseInt(form.value.stock).toString());
     formData.append("descripcion", form.value.descripcion?.trim() || "");
-    formData.append("descuento", (parseInt(form.value.descuento) || 0).toString());
+    formData.append(
+      "descuento",
+      (parseInt(form.value.descuento) || 0).toString(),
+    );
     formData.append("activo", form.value.activo.toString());
 
     // Solo agregar imagen si hay una nueva
@@ -332,8 +365,8 @@ const handleSubmit = async () => {
       await adminServices.createProduct(formData);
       toast.success("Producto creado correctamente");
     }
-    
-    emit('saved');
+
+    emit("saved");
     emitter.emit(EVENT_TYPES.PRODUCT_UPDATED);
   } catch (error) {
     console.error("DEBUG - Error completo:", error);
@@ -341,8 +374,8 @@ const handleSubmit = async () => {
 
     if (error.response?.data) {
       const errorData = error.response.data;
-      
-      if (typeof errorData === 'string') {
+
+      if (typeof errorData === "string") {
         toast.error(errorData);
       } else if (errorData.detail) {
         toast.error(errorData.detail);
@@ -367,38 +400,41 @@ const handleSubmit = async () => {
   }
 };
 
-
 // Watch para cargar datos cuando se está editando
-watch(() => props.editingProduct, (product) => {
-  if (product) {
-    // Primero seleccionamos la categoría completa, no solo el ID
-    selectedCategory.value = product.categoria?.id;
-    
-    // Luego seleccionamos la subcategoría
-    selectedSubcategory.value = product.subcategoria?.id;
-    
-    form.value = {
-      nombre: product.nombre || "",
-      descripcion: product.descripcion || "",
-      precio: product.precio || 0,
-      stock: product.stock || 0,
-      imagen: null,
-      descuento: product.descuento || 0,
-      activo: typeof product.activo === "boolean" ? product.activo : true,
-    };
-    
-    if (product.imagen) {
-      imagePreview.value = product.imagen;
+watch(
+  () => props.editingProduct,
+  (product) => {
+    if (product) {
+      // Primero seleccionamos la categoría completa, no solo el ID
+      selectedCategory.value = product.categoria?.id;
+
+      // Luego seleccionamos la subcategoría
+      selectedSubcategory.value = product.subcategoria?.id;
+
+      form.value = {
+        nombre: product.nombre || "",
+        descripcion: product.descripcion || "",
+        precio: product.precio || 0,
+        stock: product.stock || 0,
+        imagen: null,
+        descuento: product.descuento || 0,
+        activo: typeof product.activo === "boolean" ? product.activo : true,
+      };
+
+      if (product.imagen) {
+        imagePreview.value = product.imagen;
+      }
     }
-  }
-}, { immediate: true });
-</script> 
+  },
+  { immediate: true },
+);
+</script>
 
 <style scoped>
 /* Estilos para mejorar el scroll */
 .overflow-y-auto {
   scrollbar-width: thin;
-  scrollbar-color: #4B5563 #1F2937;
+  scrollbar-color: #4b5563 #1f2937;
 }
 
 .overflow-y-auto::-webkit-scrollbar {
@@ -406,11 +442,11 @@ watch(() => props.editingProduct, (product) => {
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
-  background: #1F2937;
+  background: #1f2937;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
-  background-color: #4B5563;
+  background-color: #4b5563;
   border-radius: 4px;
 }
-</style> 
+</style>

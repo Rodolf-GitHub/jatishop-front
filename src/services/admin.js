@@ -20,7 +20,7 @@ adminApi.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 export const adminServices = {
@@ -38,7 +38,7 @@ export const adminServices = {
           email: response.data.email,
           username: response.data.username,
           negocio: response.data.negocio,
-        })
+        }),
       );
     }
     return response;
@@ -68,7 +68,7 @@ export const adminServices = {
         headers: {
           Authorization: `Token ${token}`,
         },
-      }
+      },
     );
   },
 
@@ -85,7 +85,7 @@ export const adminServices = {
   // Negocios
   getNegocio: async () => {
     try {
-      const response = await adminApi.get('/mi-negocio/negocio/my_business/');
+      const response = await adminApi.get("/mi-negocio/negocio/my_business/");
       return response;
     } catch (error) {
       console.error("Error al obtener negocio:", error);
@@ -117,11 +117,11 @@ export const adminServices = {
           // Manejar el objeto tema
           formData.append(
             "color_primario",
-            data[key].color_primario || "#8E44AD"
+            data[key].color_primario || "#8E44AD",
           );
           formData.append(
             "color_secundario",
-            data[key].color_secundario || "#E67E22"
+            data[key].color_secundario || "#E67E22",
           );
         } else if (typeof data[key] === "boolean") {
           formData.append(key, data[key].toString());
@@ -187,7 +187,7 @@ export const adminServices = {
       return Promise.reject("Provincia es requerida");
     }
     return adminApi.get(
-      `/ubicaciones/municipios/${encodeURIComponent(provincia)}/`
+      `/ubicaciones/municipios/${encodeURIComponent(provincia)}/`,
     );
   },
 
@@ -195,23 +195,27 @@ export const adminServices = {
 
   // Categorías
   getMyCategories() {
-    return adminApi.get('/mi-negocio/categorias/my_categories/');
+    return adminApi.get("/mi-negocio/categorias/my_categories/");
   },
 
   createCategory(formData) {
-    return adminApi.post('/mi-negocio/categorias/my_categories/', formData, {
+    return adminApi.post("/mi-negocio/categorias/my_categories/", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        "Content-Type": "multipart/form-data",
+      },
     });
   },
 
   updateCategory(id, formData) {
-    return adminApi.put(`/mi-negocio/categorias/${id}/manage_category/`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    return adminApi.put(
+      `/mi-negocio/categorias/${id}/manage_category/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
   },
 
   deleteCategory(id) {
@@ -224,49 +228,59 @@ export const adminServices = {
   },
 
   createSubcategory(categoryId, formData) {
-    return adminApi.post(`/mi-negocio/categorias/${categoryId}/subcategories/`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
+    return adminApi.post(
+      `/mi-negocio/categorias/${categoryId}/subcategories/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
+    );
   },
 
   updateSubcategory(categoryId, subcategoryId, formData) {
     return adminApi.put(
-      `/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`, 
+      `/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`,
       formData,
       {
         headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      }
+          "Content-Type": "multipart/form-data",
+        },
+      },
     );
   },
 
   deleteSubcategory(categoryId, subcategoryId) {
-    return adminApi.delete(`/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`);
+    return adminApi.delete(
+      `/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`,
+    );
   },
 
   // Productos
   getMyProducts() {
-    return adminApi.get('/mi-negocio/productos/my_products/');
+    return adminApi.get("/mi-negocio/productos/my_products/");
   },
 
   createProduct(formData) {
-    return adminApi.post('/mi-negocio/productos/my_products/', formData, {
+    return adminApi.post("/mi-negocio/productos/my_products/", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        "Content-Type": "multipart/form-data",
+      },
     });
   },
 
   updateProduct(id, formData) {
-    return adminApi.put(`/mi-negocio/productos/${id}/update_product/`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+    return adminApi.put(
+      `/mi-negocio/productos/${id}/update_product/`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        timeout: 0,
       },
-      timeout: 0
-    });
+    );
   },
 
   deleteProduct(id) {
@@ -274,7 +288,7 @@ export const adminServices = {
   },
 
   getResumen() {
-    return adminApi.get('/mi-negocio/resumen/');
+    return adminApi.get("/mi-negocio/resumen/");
   },
 };
 
@@ -287,7 +301,7 @@ adminApi.interceptors.response.use(
       localStorage.removeItem("admin_user");
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default adminApi;

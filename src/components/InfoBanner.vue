@@ -6,7 +6,7 @@
       </span>
       <span class="info-banner-text text-xs">
         ¡E-comCuba se ha actualizado!
-        <router-link 
+        <router-link
           v-if="showNewFeaturesButton"
           to="/newFeatures"
           class="new-features-button"
@@ -23,34 +23,34 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue'
+import { ref, defineProps } from "vue";
 import { InformationCircleIcon, XMarkIcon } from "@heroicons/vue/24/outline";
 
 const props = defineProps({
   dismissible: {
     type: Boolean,
-    default: true
+    default: true,
   },
   autoHide: {
     type: Number,
-    default: 0
+    default: 0,
   },
   showNewFeaturesButton: {
     type: Boolean,
-    default: true
-  }
-})
+    default: true,
+  },
+});
 
-const visible = ref(true)
+const visible = ref(true);
 
 const dismiss = () => {
-  visible.value = false
-}
+  visible.value = false;
+};
 
 if (props.autoHide > 0) {
   setTimeout(() => {
-    visible.value = false
-  }, props.autoHide)
+    visible.value = false;
+  }, props.autoHide);
 }
 </script>
 
@@ -63,8 +63,8 @@ if (props.autoHide > 0) {
   width: 100%;
   margin: 0 auto;
   font-size: 0.75rem;
-  background-color: #DCFCE7;
-  border-bottom: 1px solid #86EFAC;
+  background-color: #dcfce7;
+  border-bottom: 1px solid #86efac;
   transition: all 0.3s ease;
 }
 
@@ -81,7 +81,7 @@ if (props.autoHide > 0) {
 .info-banner-icon {
   display: flex;
   align-items: center;
-  color: #16A34A;
+  color: #16a34a;
 }
 
 .info-banner-close {
@@ -106,7 +106,7 @@ if (props.autoHide > 0) {
   align-items: center;
   margin-left: 0.25rem;
   padding: 0.125rem 0.5rem;
-  background-color: #16A34A;
+  background-color: #16a34a;
   color: white;
   border-radius: 0.25rem;
   font-weight: 500;
@@ -117,7 +117,7 @@ if (props.autoHide > 0) {
 }
 
 .new-features-button:hover {
-  background-color: #15803D;
+  background-color: #15803d;
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -127,7 +127,7 @@ if (props.autoHide > 0) {
 }
 
 .success {
-  background-color: #DCFCE7;
+  background-color: #dcfce7;
   color: #166534;
 }
-</style> 
+</style>

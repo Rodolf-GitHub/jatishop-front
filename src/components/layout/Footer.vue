@@ -1,5 +1,9 @@
 <script setup>
-import { ChatBubbleLeftRightIcon, BuildingStorefrontIcon, InformationCircleIcon } from '@heroicons/vue/24/outline';
+import {
+  ChatBubbleLeftRightIcon,
+  BuildingStorefrontIcon,
+  InformationCircleIcon,
+} from "@heroicons/vue/24/outline";
 </script>
 
 <template>
@@ -14,15 +18,15 @@ import { ChatBubbleLeftRightIcon, BuildingStorefrontIcon, InformationCircleIcon 
 
         <!-- Enlaces -->
         <div class="flex space-x-6">
-          <router-link 
+          <router-link
             to="/tiendas"
             class="text-sm hover:text-white transition-colors flex items-center gap-1"
           >
             <BuildingStorefrontIcon class="h-4 w-4" />
             Tiendas
           </router-link>
-          
-          <router-link 
+
+          <router-link
             to="/acerca"
             class="text-sm hover:text-white transition-colors flex items-center gap-1"
           >
@@ -30,8 +34,8 @@ import { ChatBubbleLeftRightIcon, BuildingStorefrontIcon, InformationCircleIcon 
             Crear Tienda
           </router-link>
 
-          <a 
-            href="https://chat.whatsapp.com/DjFYBTcfSdg4jF7SIMMVOS" 
+          <a
+            href="https://chat.whatsapp.com/DjFYBTcfSdg4jF7SIMMVOS"
             target="_blank"
             class="text-sm hover:text-white transition-colors flex items-center gap-1"
           >

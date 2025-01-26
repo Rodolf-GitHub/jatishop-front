@@ -1,20 +1,20 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
-import { PROVINCIAS, getMunicipios } from '@/utils/ubicaciones';
+import { ref, watch, onMounted } from "vue";
+import { PROVINCIAS, getMunicipios } from "@/utils/ubicaciones";
 
 const props = defineProps({
   modelValue: {
     type: Object,
-    default: () => ({ provincia: '', municipio: '' })
-  }
+    default: () => ({ provincia: "", municipio: "" }),
+  },
 });
 
-const emit = defineEmits(['update:modelValue']);
+const emit = defineEmits(["update:modelValue"]);
 
 const provincias = ref(PROVINCIAS);
 const municipios = ref([]);
-const selectedProvincia = ref(props.modelValue.provincia || '');
-const selectedMunicipio = ref(props.modelValue.municipio || '');
+const selectedProvincia = ref(props.modelValue.provincia || "");
+const selectedMunicipio = ref(props.modelValue.municipio || "");
 
 const loadMunicipios = (provincia) => {
   if (!provincia) {
@@ -25,29 +25,33 @@ const loadMunicipios = (provincia) => {
 };
 
 watch(selectedProvincia, (newProvincia) => {
-  selectedMunicipio.value = '';
+  selectedMunicipio.value = "";
   loadMunicipios(newProvincia);
-  emit('update:modelValue', {
+  emit("update:modelValue", {
     provincia: newProvincia,
-    municipio: ''
+    municipio: "",
   });
 });
 
 watch(selectedMunicipio, (newMunicipio) => {
-  emit('update:modelValue', {
+  emit("update:modelValue", {
     provincia: selectedProvincia.value,
-    municipio: newMunicipio
+    municipio: newMunicipio,
   });
 });
 
-watch(() => props.modelValue, (newValue) => {
-  if (newValue.provincia !== selectedProvincia.value) {
-    selectedProvincia.value = newValue.provincia;
-  }
-  if (newValue.municipio !== selectedMunicipio.value) {
-    selectedMunicipio.value = newValue.municipio;
-  }
-}, { deep: true });
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue.provincia !== selectedProvincia.value) {
+      selectedProvincia.value = newValue.provincia;
+    }
+    if (newValue.municipio !== selectedMunicipio.value) {
+      selectedMunicipio.value = newValue.municipio;
+    }
+  },
+  { deep: true },
+);
 
 onMounted(() => {
   if (props.modelValue.provincia) {

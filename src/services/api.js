@@ -5,50 +5,55 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 export const services = {
   // Marketplace
   getStores: (params = {}) => {
     const queryParams = new URLSearchParams();
-    if (params.provincia) queryParams.append('provincia', params.provincia);
-    if (params.municipio) queryParams.append('municipio', params.municipio);
-    if (params.search) queryParams.append('search', params.search);
-    
+    if (params.provincia) queryParams.append("provincia", params.provincia);
+    if (params.municipio) queryParams.append("municipio", params.municipio);
+    if (params.search) queryParams.append("search", params.search);
+
     return api.get(`/marketplace/negocios/?${queryParams.toString()}`);
   },
   getMarketplaceProducts: (params = {}) => {
     const queryParams = new URLSearchParams();
-    if (params.provincia) queryParams.append('provincia', params.provincia);
-    if (params.municipio) queryParams.append('municipio', params.municipio);
-    if (params.search) queryParams.append('search', params.search);
-    
+    if (params.provincia) queryParams.append("provincia", params.provincia);
+    if (params.municipio) queryParams.append("municipio", params.municipio);
+    if (params.search) queryParams.append("search", params.search);
+
     return api.get(`/marketplace/productos/?${queryParams.toString()}`);
   },
-  
+
   // Tienda específica
   getStore: (slug) => api.get(`/tienda/${slug}/`),
-  
+
   // Categorías
   getCategorias: (slug) => api.get(`/tienda/${slug}/categorias/`),
   getCategoria: (slug, id) => api.get(`/tienda/${slug}/categorias/${id}/`),
-  
+
   // Subcategorías
   getSubcategorias: (slug) => api.get(`/tienda/${slug}/subcategorias/`),
-  getSubcategoria: (slug, id) => api.get(`/tienda/${slug}/subcategorias/${id}/`),
-  
+  getSubcategoria: (slug, id) =>
+    api.get(`/tienda/${slug}/subcategorias/${id}/`),
+
   // Productos
-  getProductos: (slug, page = 1, pageSize = 20) => 
+  getProductos: (slug, page = 1, pageSize = 20) =>
     api.get(`/tienda/${slug}/productos/?page=${page}&page_size=${pageSize}`),
-  getProductosDestacados: (slug) => 
+  getProductosDestacados: (slug) =>
     api.get(`/tienda/${slug}/productos/destacados/`),
-  getProductosPorCategoria: (slug, categoriaId) => 
-    api.get(`/tienda/${slug}/productos/categoria/`, { params: { categoria_id: categoriaId } }),
-  getProductosPorSubcategoria: (slug, subcategoriaId) => 
-    api.get(`/tienda/${slug}/productos/subcategoria/`, { params: { subcategoria_id: subcategoriaId } }),
+  getProductosPorCategoria: (slug, categoriaId) =>
+    api.get(`/tienda/${slug}/productos/categoria/`, {
+      params: { categoria_id: categoriaId },
+    }),
+  getProductosPorSubcategoria: (slug, subcategoriaId) =>
+    api.get(`/tienda/${slug}/productos/subcategoria/`, {
+      params: { subcategoria_id: subcategoriaId },
+    }),
   getProducto: (slug, id) => api.get(`/tienda/${slug}/productos/${id}/`),
 
   buscarProductos(slug, query, categoriaId = null) {
@@ -60,23 +65,23 @@ export const services = {
   },
 
   // Productos específicos de una tienda con paginación
-  getProductosPorTienda: (slug, page = 1, pageSize = 20) => 
-    api.get(`/tienda/${slug}/productos/todos/`, { 
-      params: { 
-        page, 
-        page_size: pageSize 
-      }
+  getProductosPorTienda: (slug, page = 1, pageSize = 20) =>
+    api.get(`/tienda/${slug}/productos/todos/`, {
+      params: {
+        page,
+        page_size: pageSize,
+      },
     }),
 
   getStoreProducts: (storeSlug, page = 1) => {
     return api.get(`/tienda/${storeSlug}/productos/`, {
-      params: { page }
+      params: { page },
     });
   },
 
   // Obtener lista de provincias
   getProvincias() {
-    return api.get('/ubicaciones/provincias/');
+    return api.get("/ubicaciones/provincias/");
   },
 
   // Obtener municipios de una provincia específica - Corregida la URL
@@ -87,30 +92,30 @@ export const services = {
 
 // Interceptor para debugging
 api.interceptors.request.use(
-  config => {
-    console.log('Request Config:', {
+  (config) => {
+    console.log("Request Config:", {
       url: config.url,
       baseURL: config.baseURL,
       fullURL: config.baseURL + config.url,
-      headers: config.headers
+      headers: config.headers,
     });
     return config;
   },
-  error => {
+  (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 api.interceptors.response.use(
-  response => {
-    console.log('Response Data Type:', typeof response.data);
-    console.log('Response Headers:', response.headers);
+  (response) => {
+    console.log("Response Data Type:", typeof response.data);
+    console.log("Response Headers:", response.headers);
     return response;
   },
-  error => {
-    console.error('API Error:', error.response || error);
+  (error) => {
+    console.error("API Error:", error.response || error);
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

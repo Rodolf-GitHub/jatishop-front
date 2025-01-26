@@ -51,19 +51,17 @@ const fetchProductos = async (page = 1) => {
     const productosFormateados = response.data.results.map((producto) => ({
       id: producto.id,
       nombre: producto.nombre,
-      descripcion: producto.descripcion,
       precio: producto.precio,
       precio_con_descuento: producto.precio_con_descuento,
       stock: producto.stock,
       descuento: producto.descuento,
       imagen: producto.imagen,
       activo: producto.activo,
-      created_at: producto.created_at,
-      updated_at: producto.updated_at,
       subcategoria: producto.subcategoria,
-      tienda_nombre: producto.tienda_nombre,
-      tienda_slug: producto.tienda_slug,
-      tienda_id: producto.tienda_id,
+      tienda_nombre: producto.negocio?.nombre,
+      tienda_slug: producto.negocio?.slug,
+      tienda_id: producto.negocio?.id,
+      negocio: producto.negocio
     }));
 
     if (page === 1) {
@@ -76,9 +74,10 @@ const fetchProductos = async (page = 1) => {
     if (hasMore.value) {
       currentPage.value = page + 1;
     }
+
   } catch (err) {
-    hasMore.value = false;
     console.error("Error:", err);
+    hasMore.value = false;
   } finally {
     loading.value = false;
     loadingMore.value = false;

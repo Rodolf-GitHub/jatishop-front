@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRoute } from 'vue-router';
+import { useRoute } from "vue-router";
 import { services } from "@/services/api";
 import InfiniteProductList from "@/components/products/InfiniteProductList.vue";
 import { useCartStore } from "@/stores/cartStore";
@@ -19,7 +19,7 @@ const handleLoadError = (err) => {
     return;
   }
   error.value = "Error al cargar los productos";
-  console.error('Error en StoreView:', err);
+  console.error("Error en StoreView:", err);
 };
 
 const handleProductsLoaded = (products) => {
@@ -33,20 +33,30 @@ const fetchStoreInfo = async () => {
   try {
     const response = await services.getStore(route.params.slug);
     infoNegocio.value = response.data;
-    
+
     // Actualizar meta tags para compartir
-    document.querySelector('meta[property="og:title"]').setAttribute('content', infoNegocio.value.nombre);
-    document.querySelector('meta[property="og:description"]').setAttribute('content', infoNegocio.value.descripcion || 'Tienda en E-comCuba');
-    document.querySelector('meta[property="og:image"]').setAttribute('content', infoNegocio.value.logo);
-    document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
+    document
+      .querySelector('meta[property="og:title"]')
+      .setAttribute("content", infoNegocio.value.nombre);
+    document
+      .querySelector('meta[property="og:description"]')
+      .setAttribute(
+        "content",
+        infoNegocio.value.descripcion || "Tienda en E-comCuba",
+      );
+    document
+      .querySelector('meta[property="og:image"]')
+      .setAttribute("content", infoNegocio.value.logo);
+    document
+      .querySelector('meta[property="og:url"]')
+      .setAttribute("content", window.location.href);
     document.title = infoNegocio.value.nombre;
-    
+
     // Inicializar el carrito para esta tienda
     cartStore.setCurrentStore(route.params.slug, {
       nombre: response.data.nombre,
-      slug: route.params.slug
+      slug: route.params.slug,
     });
-    
   } catch (err) {
     error.value = "Error al cargar la información de la tienda";
     console.error(err);
@@ -56,15 +66,16 @@ const fetchStoreInfo = async () => {
 onMounted(() => {
   fetchStoreInfo();
 });
-
 </script>
 <template>
   <div class="bg-gray-50 min-h-screen">
     <!-- Banner de imagen de portada con overlay mejorado -->
     <div v-if="infoNegocio?.img_portada" class="w-full relative mt-[72px] mb-8">
-      <img :src="infoNegocio.img_portada" 
-           :alt="infoNegocio.nombre"
-           class="w-full h-64 md:h-80 lg:h-96 object-cover object-center">
+      <img
+        :src="infoNegocio.img_portada"
+        :alt="infoNegocio.nombre"
+        class="w-full h-64 md:h-80 lg:h-96 object-cover object-center"
+      />
       <div class="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60">
         <div class="container mx-auto h-full flex items-end p-8">
           <h1 class="text-white text-3xl md:text-4xl font-bold">
@@ -85,7 +96,7 @@ onMounted(() => {
         <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
           Todo Nuestro Catálogo
         </h2>
-        <InfiniteProductList 
+        <InfiniteProductList
           :store-slug="route.params.slug"
           @products-loaded="handleProductsLoaded"
           @error="handleLoadError"

@@ -252,7 +252,13 @@ const getTransferTitle = (acceptsTransfer) => {
       </div>
     </nav>
 
-    <div :class="{ 'h-44 md:h-28': store && showSearch, 'h-32 md:h-28': store && !showSearch, 'h-14 md:h-16': !store }"></div>
+    <div
+      :class="{
+        'h-44 md:h-28': store && showSearch,
+        'h-32 md:h-28': store && !showSearch,
+        'h-14 md:h-16': !store,
+      }"
+    ></div>
 
     <SideBar
       v-if="store"

@@ -24,10 +24,10 @@ const getGoogleMapsUrl = computed(() => {
   if (!infoNegocio.value?.latitud || !infoNegocio.value?.longitud) {
     return null;
   }
-  
+
   const lat = infoNegocio.value.latitud;
   const lng = infoNegocio.value.longitud;
-  
+
   // Aumentamos el zoom a 19 para ver más cerca
   return `https://www.google.com/maps?q=${lat},${lng}&z=19&output=embed&t=m`;
 });
@@ -36,11 +36,11 @@ const getDirectionsUrl = computed(() => {
   if (!infoNegocio.value?.latitud || !infoNegocio.value?.longitud) {
     return null;
   }
-  
+
   const lat = infoNegocio.value.latitud;
   const lng = infoNegocio.value.longitud;
   const nombre = encodeURIComponent(infoNegocio.value.nombre);
-  
+
   return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_name=${nombre}`;
 });
 </script>
@@ -60,16 +60,24 @@ const getDirectionsUrl = computed(() => {
         </h2>
         <div class="space-y-4">
           <div class="mb-6">
-            <h3 class="font-medium mb-2">Compra por WhatsApp en 3 sencillos pasos:</h3>
+            <h3 class="font-medium mb-2">
+              Compra por WhatsApp en 3 sencillos pasos:
+            </h3>
             <ol class="list-decimal list-inside space-y-2 text-gray-600 ml-4">
               <li>Agrega los productos que desees al carrito</li>
               <li>Da clic en "Copiar pedido al portapapeles"</li>
-              <li>Ve a "Comprar por WhatsApp", pega tu mensaje copiado y envíalo. ¡Listo! Recibiremos tu orden</li>
+              <li>
+                Ve a "Comprar por WhatsApp", pega tu mensaje copiado y envíalo.
+                ¡Listo! Recibiremos tu orden
+              </li>
             </ol>
           </div>
           <div class="pt-4 border-t border-gray-200">
             <h3 class="font-medium mb-2">Compra en tienda física:</h3>
-            <p class="text-gray-600">También puedes visitarnos en nuestra tienda física para realizar tu compra personalmente.</p>
+            <p class="text-gray-600">
+              También puedes visitarnos en nuestra tienda física para realizar
+              tu compra personalmente.
+            </p>
           </div>
         </div>
       </div>
@@ -96,8 +104,8 @@ const getDirectionsUrl = computed(() => {
           <div v-if="infoNegocio?.whatsapp" class="flex items-start gap-4">
             <div class="flex-1">
               <p class="font-medium">WhatsApp</p>
-              <a 
-                :href="infoNegocio.whatsapp" 
+              <a
+                :href="infoNegocio.whatsapp"
                 target="_blank"
                 class="text-jati hover:text-shop transition-colors"
               >
@@ -109,7 +117,10 @@ const getDirectionsUrl = computed(() => {
       </div>
 
       <!-- Ubicación -->
-      <div v-if="infoNegocio?.direccion" class="bg-white rounded-2xl shadow-lg p-6">
+      <div
+        v-if="infoNegocio?.direccion"
+        class="bg-white rounded-2xl shadow-lg p-6"
+      >
         <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
           <MapPinIcon class="h-6 w-6 text-jati" />
           Ubicación
@@ -135,7 +146,7 @@ const getDirectionsUrl = computed(() => {
         </div>
 
         <!-- Mapa -->
-        <div 
+        <div
           v-if="infoNegocio?.latitud && infoNegocio?.longitud"
           class="relative h-[450px] rounded-2xl overflow-hidden shadow-lg mt-4"
         >

@@ -6,7 +6,10 @@
       ></div>
     </div>
 
-    <div v-else-if="error" class="bg-red-500/10 border border-red-500 rounded-xl p-4 mb-6">
+    <div
+      v-else-if="error"
+      class="bg-red-500/10 border border-red-500 rounded-xl p-4 mb-6"
+    >
       <p class="text-red-500">{{ error }}</p>
     </div>
 
@@ -42,10 +45,11 @@
                 class="w-24 h-24 rounded-lg bg-gray-700 flex items-center justify-center overflow-hidden"
               >
                 <img
-                  v-if="previewLogo"
-                  :src="previewLogo"
-                  alt="Logo Preview"
+                  v-if="previewLogo || negocio?.logo"
+                  :src="previewLogo || getLogoUrl(negocio.logo)"
+                  :alt="negocio?.nombre"
                   class="w-full h-full object-cover"
+                  @error="$event.target.src = '/no-image.png'"
                 />
                 <i v-else class="fas fa-store text-4xl text-gray-500"></i>
               </div>
@@ -76,10 +80,11 @@
                 class="w-32 h-24 rounded-lg bg-gray-700 flex items-center justify-center overflow-hidden"
               >
                 <img
-                  v-if="previewPortada"
-                  :src="previewPortada"
-                  alt="Portada Preview"
+                  v-if="previewPortada || negocio?.img_portada"
+                  :src="previewPortada || getBannerUrl(negocio.img_portada)"
+                  :alt="negocio?.nombre"
                   class="w-full h-full object-cover"
+                  @error="$event.target.src = '/no-image.png'"
                 />
                 <i v-else class="fas fa-image text-4xl text-gray-500"></i>
               </div>
@@ -145,15 +150,28 @@
           <!-- WhatsApp Field con botón de ayuda -->
           <div>
             <div class="flex items-center gap-2 mb-2">
-              <label class="block text-sm font-medium text-gray-300">WhatsApp</label>
+              <label class="block text-sm font-medium text-gray-300"
+                >WhatsApp</label
+              >
               <button
                 type="button"
                 @click="showWhatsappHelp = true"
                 class="text-gray-400 hover:text-gray-300"
                 title="Ayuda con WhatsApp"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-5 h-5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"
+                  />
                 </svg>
               </button>
             </div>
@@ -163,10 +181,12 @@
               placeholder="Ej: https://wa.me/5355123456"
               :class="[
                 'w-full px-4 py-2 bg-gray-700 border rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500',
-                whatsappError ? 'border-red-500' : 'border-gray-600'
+                whatsappError ? 'border-red-500' : 'border-gray-600',
               ]"
             />
-            <span v-if="whatsappError" class="text-red-500 text-sm mt-1">{{ whatsappError }}</span>
+            <span v-if="whatsappError" class="text-red-500 text-sm mt-1">{{
+              whatsappError
+            }}</span>
           </div>
         </div>
 
@@ -465,23 +485,34 @@
 
     <!-- Modal de ayuda WhatsApp -->
     <Teleport to="body">
-      <div v-if="showWhatsappHelp" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div
+        v-if="showWhatsappHelp"
+        class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      >
         <div class="bg-gray-800 rounded-xl w-full max-w-md p-6">
-          <h3 class="text-lg font-medium text-white mb-4">Formato de WhatsApp</h3>
+          <h3 class="text-lg font-medium text-white mb-4">
+            Formato de WhatsApp
+          </h3>
           <div class="text-gray-300 space-y-3">
             <p>Puedes usar cualquiera de estos formatos:</p>
             <div class="space-y-2">
               <p class="font-medium">1. Número directo:</p>
               <code class="block bg-gray-700 p-2 rounded">5355123456</code>
-              <p class="text-sm text-gray-400">(Se convertirá automáticamente a https://wa.me/5355123456)</p>
+              <p class="text-sm text-gray-400">
+                (Se convertirá automáticamente a https://wa.me/5355123456)
+              </p>
             </div>
             <div class="space-y-2">
               <p class="font-medium">2. Enlace de WhatsApp:</p>
-              <code class="block bg-gray-700 p-2 rounded">https://wa.me/5355123456</code>
+              <code class="block bg-gray-700 p-2 rounded"
+                >https://wa.me/5355123456</code
+              >
             </div>
             <div class="space-y-2">
               <p class="font-medium">3. Enlace de grupo:</p>
-              <code class="block bg-gray-700 p-2 rounded">https://chat.whatsapp.com/abc123...</code>
+              <code class="block bg-gray-700 p-2 rounded"
+                >https://chat.whatsapp.com/abc123...</code
+              >
             </div>
             <p class="mt-4">Donde:</p>
             <ul class="list-disc list-inside">
@@ -502,19 +533,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from "vue";
+import { ref, onMounted, watch, nextTick, onUnmounted } from "vue";
 import { adminServices } from "@/services/admin";
 import { useRouter } from "vue-router";
 import { useToast } from "vue-toastification";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { PROVINCIAS, getMunicipios } from "@/utils/ubicaciones";
-import { emitter, EVENT_TYPES } from '@/utils/eventBus';
+import { emitter, EVENT_TYPES } from "@/utils/eventBus";
+import { getImageUrl } from "@/utils/image";
 
 const router = useRouter();
 const toast = useToast();
 
-const negocio = ref(null);
+const negocio = ref({});
 const loading = ref(false);
 const error = ref(null);
 const provincias = ref(PROVINCIAS);
@@ -534,7 +566,7 @@ const hasChanges = ref(false); // Para controlar si hay cambios
 
 // Nuevos refs
 const showWhatsappHelp = ref(false);
-const whatsappError = ref('');
+const whatsappError = ref("");
 
 // Formulario con valores por defecto según el modelo
 const form = ref({
@@ -564,13 +596,11 @@ const form = ref({
 const init = async () => {
   loading.value = true;
   try {
-    // Intentar obtener el negocio directamente sin verificar currentUser
     const response = await adminServices.getNegocio();
-    
-    // Si tenemos respuesta, significa que el usuario tiene un negocio
+
     if (response.data) {
       negocio.value = response.data;
-      
+
       // Asignar los valores al formulario
       const tema = response.data.tema || {};
       Object.assign(form.value, {
@@ -581,17 +611,16 @@ const init = async () => {
         },
       });
 
-      if (response.data.logo) previewLogo.value = response.data.logo;
-      if (response.data.img_portada) previewPortada.value = response.data.img_portada;
+      // No asignar las imágenes directamente a previewLogo/previewPortada
+      form.value.logo = response.data.logo || null;
+      form.value.img_portada = response.data.img_portada || null;
 
       // Guardar el estado inicial después de cargar los datos
       saveInitialState();
     }
 
-    // Cargar datos necesarios para el formulario
     await loadProvincias();
   } catch (err) {
-    // Si el error es 404, significa que el usuario no tiene negocio
     if (err.response?.status === 404) {
       negocio.value = null;
     } else {
@@ -631,30 +660,36 @@ watch(
     } else {
       municipios.value = [];
     }
-  }
+  },
 );
 
 // Manejar cambios de imágenes
 const handleLogoChange = (event) => {
   const file = event.target.files[0];
   if (file) {
-    form.value.logo = file;
+    if (previewLogo.value) {
+      URL.revokeObjectURL(previewLogo.value);
+    }
     previewLogo.value = URL.createObjectURL(file);
+    form.value.logo = file;
   }
 };
 
 const handlePortadaChange = (event) => {
   const file = event.target.files[0];
   if (file) {
-    form.value.img_portada = file;
+    if (previewPortada.value) {
+      URL.revokeObjectURL(previewPortada.value);
+    }
     previewPortada.value = URL.createObjectURL(file);
+    form.value.img_portada = file;
   }
 };
 
 // Función para validar y formatear WhatsApp
 const validateWhatsApp = (input) => {
   if (!input) return true; // Permitir vacío ya que es opcional
-  
+
   // Si es solo números, convertir a enlace wa.me
   const numberOnly = /^\d{8,}$/;
   if (numberOnly.test(input)) {
@@ -665,7 +700,7 @@ const validateWhatsApp = (input) => {
   // Validar enlaces wa.me o grupos de WhatsApp
   const waLinkRegex = /^https:\/\/wa\.me\/\d{8,}$/;
   const waGroupRegex = /^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]{22}$/;
-  
+
   return waLinkRegex.test(input) || waGroupRegex.test(input);
 };
 
@@ -681,7 +716,7 @@ const validateForm = () => {
     telefono: "Teléfono",
     provincia: "Provincia",
     municipio: "Municipio",
-    direccion: "Dirección"
+    direccion: "Dirección",
   };
 
   for (const [field, label] of Object.entries(requiredFields)) {
@@ -709,7 +744,7 @@ const validateForm = () => {
   }
 
   if (!isValid) {
-    errors.forEach(error => toast.error(error));
+    errors.forEach((error) => toast.error(error));
   }
 
   return isValid;
@@ -780,7 +815,6 @@ const handleSubmit = async () => {
     saveInitialState();
     // Reseteamos la bandera de cambios
     hasChanges.value = false;
-    
   } catch (err) {
     console.error("Error:", err);
     if (err.response?.data) {
@@ -811,7 +845,7 @@ watch(
   () => {
     hasChanges.value = checkChanges();
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Función para resetear el formulario
@@ -894,6 +928,25 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
+
+// Agregar computed o método para manejar las URLs de las imágenes
+const getLogoUrl = (logo) => {
+  return getImageUrl(logo);
+};
+
+const getBannerUrl = (banner) => {
+  return getImageUrl(banner);
+};
+
+// Limpiar las URLs de previsualización cuando el componente se desmonte
+onUnmounted(() => {
+  if (previewLogo.value && previewLogo.value.startsWith('blob:')) {
+    URL.revokeObjectURL(previewLogo.value);
+  }
+  if (previewPortada.value && previewPortada.value.startsWith('blob:')) {
+    URL.revokeObjectURL(previewPortada.value);
+  }
 });
 
 onMounted(init);

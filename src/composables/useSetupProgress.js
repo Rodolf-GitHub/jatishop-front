@@ -1,12 +1,12 @@
-import { ref } from 'vue';
-import { adminServices } from '@/services/admin';
+import { ref } from "vue";
+import { adminServices } from "@/services/admin";
 
 export function useSetupProgress() {
   const setupProgress = ref({
     negocio: false,
     categoria: false,
     subcategoria: false,
-    producto: false
+    producto: false,
   });
 
   const checkSetupProgress = async () => {
@@ -15,13 +15,13 @@ export function useSetupProgress() {
       setupProgress.value = response.data;
       return response.data;
     } catch (error) {
-      console.error('Error al verificar el progreso:', error);
+      console.error("Error al verificar el progreso:", error);
       return setupProgress.value;
     }
   };
 
   return {
     setupProgress,
-    checkSetupProgress
+    checkSetupProgress,
   };
 }

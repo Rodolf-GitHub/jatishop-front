@@ -4,11 +4,11 @@ import {
   ShoppingCartIcon,
   PlusIcon,
   MinusIcon,
-  PhotoIcon
+  PhotoIcon,
 } from "@heroicons/vue/24/outline";
 import { useCartStore } from "@/stores/cartStore";
-import { useRoute, useRouter } from 'vue-router';
-import { getImageUrl } from '@/utils/image';
+import { useRoute, useRouter } from "vue-router";
+import { getImageUrl } from "@/utils/image";
 
 const props = defineProps({
   producto: {
@@ -21,7 +21,7 @@ const route = useRoute();
 const router = useRouter();
 const cartStore = useCartStore();
 const cantidad = ref(1);
-const alertMessage = ref('');
+const alertMessage = ref("");
 const showAlert = ref(false);
 const imageError = ref(false);
 
@@ -35,17 +35,19 @@ const imagenUrl = computed(() => {
 const navigateToProduct = () => {
   // Asegurarse de que el ID sea string
   const productoId = props.producto.id.toString();
-  
+
   // Navegar a la vista de detalle
-  router.push({
-    name: 'store-producto',
-    params: {
-      slug: route.params.slug,
-      productoId: productoId
-    }
-  }).catch(err => {
-    console.error('Error de navegación:', err);
-  });
+  router
+    .push({
+      name: "store-producto",
+      params: {
+        slug: route.params.slug,
+        productoId: productoId,
+      },
+    })
+    .catch((err) => {
+      console.error("Error de navegación:", err);
+    });
 };
 
 const precioFinal = computed(() => {
@@ -72,7 +74,7 @@ const incrementar = () => {
   if (cantidad.value < props.producto.stock) {
     cantidad.value++;
   } else {
-    alertMessage.value = `¡Solo hay ${props.producto.stock} unidad${props.producto.stock === 1 ? '' : 'es'} disponible${props.producto.stock === 1 ? '' : 's'}!`;
+    alertMessage.value = `¡Solo hay ${props.producto.stock} unidad${props.producto.stock === 1 ? "" : "es"} disponible${props.producto.stock === 1 ? "" : "s"}!`;
     showAlert.value = true;
     setTimeout(() => {
       showAlert.value = false;
@@ -89,10 +91,10 @@ const decrementar = () => {
 const agregarAlCarrito = () => {
   try {
     if (!props.producto.stock) {
-      throw new Error('Producto sin stock disponible');
+      throw new Error("Producto sin stock disponible");
     }
     // Añadir al carrito con la cantidad seleccionada
-    for(let i = 0; i < cantidad.value; i++) {
+    for (let i = 0; i < cantidad.value; i++) {
       cartStore.addToCart(props.producto);
     }
     cantidad.value = 1; // Reset cantidad después de agregar
@@ -111,7 +113,10 @@ const agregarAlCarrito = () => {
     class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 relative"
   >
     <!-- Imagen y badge de descuento -->
-    <div class="relative aspect-square cursor-pointer" @click="navigateToProduct">
+    <div
+      class="relative aspect-square cursor-pointer"
+      @click="navigateToProduct"
+    >
       <template v-if="imagenUrl">
         <img
           :src="imagenUrl"
@@ -120,7 +125,10 @@ const agregarAlCarrito = () => {
           @error="imageError = true"
         />
       </template>
-      <div v-else class="w-full h-full flex items-center justify-center bg-gray-100">
+      <div
+        v-else
+        class="w-full h-full flex items-center justify-center bg-gray-100"
+      >
         <PhotoIcon class="h-16 w-16 text-gray-400" />
       </div>
       <div
@@ -161,8 +169,10 @@ const agregarAlCarrito = () => {
       <!-- Controles de producto -->
       <div class="space-y-2">
         <!-- Control de cantidad -->
-        <div class="flex items-center justify-center bg-gray-50 rounded-lg w-full">
-          <button 
+        <div
+          class="flex items-center justify-center bg-gray-50 rounded-lg w-full"
+        >
+          <button
             @click.stop="decrementar"
             class="bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-1.5 transition-colors"
             :disabled="cantidad === 1"
@@ -170,27 +180,32 @@ const agregarAlCarrito = () => {
           >
             <MinusIcon class="h-4 w-4" />
           </button>
-          <span class="text-sm font-medium w-8 text-center">{{ cantidad }}</span>
-          <button 
+          <span class="text-sm font-medium w-8 text-center">{{
+            cantidad
+          }}</span>
+          <button
             @click.stop="incrementar"
             class="bg-green-500 hover:bg-green-600 text-white rounded-lg px-4 py-1.5 transition-colors"
             :disabled="cantidad >= producto.stock"
-            :class="{ 'opacity-50 cursor-not-allowed': cantidad >= producto.stock }"
+            :class="{
+              'opacity-50 cursor-not-allowed': cantidad >= producto.stock,
+            }"
           >
             <PlusIcon class="h-4 w-4" />
           </button>
         </div>
 
         <!-- Botón de añadir al carrito -->
-        <button 
+        <button
           @click.stop="agregarAlCarrito"
-          class="w-full bg-gradient-to-r from-jati to-shop text-white py-2 px-4 rounded-lg 
-                 hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          class="w-full bg-gradient-to-r from-jati to-shop text-white py-2 px-4 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
           :disabled="!producto.stock"
           :class="{ 'opacity-50 cursor-not-allowed': !producto.stock }"
         >
           <ShoppingCartIcon class="h-4 w-4" />
-          <span class="text-sm">{{ producto.stock ? 'Añadir' : 'Agotado' }}</span>
+          <span class="text-sm">{{
+            producto.stock ? "Añadir" : "Agotado"
+          }}</span>
         </button>
 
         <!-- Alerta de stock -->
@@ -202,15 +217,22 @@ const agregarAlCarrito = () => {
           leave-from-class="translate-y-0 opacity-100 sm:translate-x-0"
           leave-to-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
         >
-          <div 
-            v-if="showAlert"
-            class="absolute -top-16 left-0 right-0 mx-2"
-          >
-            <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg shadow-lg">
+          <div v-if="showAlert" class="absolute -top-16 left-0 right-0 mx-2">
+            <div
+              class="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg shadow-lg"
+            >
               <div class="flex">
                 <div class="flex-shrink-0">
-                  <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  <svg
+                    class="h-5 w-5 text-red-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                      clip-rule="evenodd"
+                    />
                   </svg>
                 </div>
                 <div class="ml-3">

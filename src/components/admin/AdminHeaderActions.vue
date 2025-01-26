@@ -25,7 +25,7 @@
 
     <!-- User Menu -->
     <div class="relative">
-      <div 
+      <div
         @click.stop="toggleMenu"
         class="flex items-center gap-2 md:gap-3 cursor-pointer"
       >
@@ -35,7 +35,7 @@
           class="w-10 h-10 rounded-full border-2 border-gray-600"
         />
         <span class="hidden md:block text-gray-200">{{ username }}</span>
-        <ChevronDownIcon 
+        <ChevronDownIcon
           class="w-4 h-4 text-gray-400 transition-transform duration-200"
           :class="{ 'transform rotate-180': isMenuOpen }"
         />
@@ -52,7 +52,6 @@
         >
           <UserIcon class="w-5 h-5" />
           <span>Mi Perfil</span>
-          
         </a>
         <!-- <a
           @click="handleLogout"
@@ -76,8 +75,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import {
   ChevronDownIcon,
@@ -88,16 +87,16 @@ import {
 
 const router = useRouter();
 const { logout } = useAuth();
-const username = ref('');
+const username = ref("");
 const isMenuOpen = ref(false);
 
 onMounted(() => {
-  username.value = window.localStorage.getItem('admin_username') || '';
-  document.addEventListener('click', handleClickOutside);
+  username.value = window.localStorage.getItem("admin_username") || "";
+  document.addEventListener("click", handleClickOutside);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener("click", handleClickOutside);
 });
 
 const toggleMenu = () => {
@@ -108,14 +107,14 @@ const handleLogout = async () => {
   isMenuOpen.value = false;
   try {
     await logout();
-    router.push('/login');
+    router.push("/login");
   } catch (error) {
     console.error("Error al cerrar sesión:", error);
   }
 };
 
 const handleClickOutside = (event) => {
-  const menu = document.querySelector('.relative');
+  const menu = document.querySelector(".relative");
   if (menu && !menu.contains(event.target)) {
     isMenuOpen.value = false;
   }

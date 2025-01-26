@@ -14,7 +14,7 @@ import UsersView from "../views/admin/UsersView.vue";
 import LoginView from "@/views/auth/LoginView.vue";
 import HomeAdminView from "@/views/admin/HomeAdminView.vue";
 import NotFoundView from "@/views/NotFoundView.vue";
-import RegisterView from '@/views/auth/RegisterView.vue'
+import RegisterView from "@/views/auth/RegisterView.vue";
 import NewFeaturesView from "@/views/NewFeaturesView.vue";
 import { useAuth } from "@/composables/useAuth";
 
@@ -45,7 +45,7 @@ const router = createRouter({
           path: "/register",
           name: "register",
           component: RegisterView,
-          meta: { requiresGuest: true }
+          meta: { requiresGuest: true },
         },
         {
           path: "tiendas",

@@ -154,7 +154,7 @@
         <QuestionMarkCircleIcon class="w-6 h-6 text-indigo-400" />
         ¿No sabes cómo comenzar?
       </h2>
-      
+
       <div class="space-y-6">
         <p class="text-gray-400">
           Sigue estos pasos para configurar tu tienda correctamente:
@@ -163,49 +163,71 @@
         <div class="grid gap-4">
           <!-- Paso 1 -->
           <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 font-semibold">
+            <div
+              class="flex-shrink-0 w-8 h-8 bg-indigo-500/20 rounded-full flex items-center justify-center text-indigo-400 font-semibold"
+            >
               1
             </div>
             <div>
-              <h3 class="text-white font-medium mb-1">Configura la información de tu negocio</h3>
+              <h3 class="text-white font-medium mb-1">
+                Configura la información de tu negocio
+              </h3>
               <p class="text-gray-400">
-                Comienza añadiendo los datos básicos de tu tienda: nombre, logo, información de contacto y detalles importantes para tus clientes.
+                Comienza añadiendo los datos básicos de tu tienda: nombre, logo,
+                información de contacto y detalles importantes para tus
+                clientes.
               </p>
             </div>
           </div>
 
           <!-- Paso 2 -->
           <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 font-semibold">
+            <div
+              class="flex-shrink-0 w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 font-semibold"
+            >
               2
             </div>
             <div>
-              <h3 class="text-white font-medium mb-1">Crea tus categorías y subcategorías</h3>
+              <h3 class="text-white font-medium mb-1">
+                Crea tus categorías y subcategorías
+              </h3>
               <p class="text-gray-400">
-                Organiza tu catálogo creando categorías principales y subcategorías. Esto ayudará a tus clientes a encontrar los productos más fácilmente.
+                Organiza tu catálogo creando categorías principales y
+                subcategorías. Esto ayudará a tus clientes a encontrar los
+                productos más fácilmente.
               </p>
             </div>
           </div>
 
           <!-- Paso 3 -->
           <div class="flex gap-4">
-            <div class="flex-shrink-0 w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-green-400 font-semibold">
+            <div
+              class="flex-shrink-0 w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center text-green-400 font-semibold"
+            >
               3
             </div>
             <div>
               <h3 class="text-white font-medium mb-1">Añade tus productos</h3>
               <p class="text-gray-400">
-                Con las categorías listas, comienza a cargar tus productos. Asegúrate de incluir buenas imágenes, descripciones detalladas y precios actualizados.
+                Con las categorías listas, comienza a cargar tus productos.
+                Asegúrate de incluir buenas imágenes, descripciones detalladas y
+                precios actualizados.
               </p>
             </div>
           </div>
 
           <!-- Consejo adicional -->
-          <div class="mt-4 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+          <div
+            class="mt-4 p-4 bg-blue-500/10 rounded-lg border border-blue-500/20"
+          >
             <div class="flex items-start gap-3">
-              <InformationCircleIcon class="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
+              <InformationCircleIcon
+                class="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5"
+              />
               <p class="text-blue-300">
-                <span class="font-medium">Consejo:</span> Mantén tu catálogo organizado desde el principio te ahorrará tiempo en el futuro y mejorará la experiencia de compra de tus clientes.
+                <span class="font-medium">Consejo:</span> Mantén tu catálogo
+                organizado desde el principio te ahorrará tiempo en el futuro y
+                mejorará la experiencia de compra de tus clientes.
               </p>
             </div>
           </div>
@@ -225,6 +247,6 @@ import {
   UsersIcon,
   ChartBarIcon,
   QuestionMarkCircleIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
 } from "@heroicons/vue/24/outline";
 </script>

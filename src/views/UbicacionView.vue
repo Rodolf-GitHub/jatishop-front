@@ -20,10 +20,10 @@ const getGoogleMapsUrl = computed(() => {
   if (!infoNegocio.value?.latitud || !infoNegocio.value?.longitud) {
     return null;
   }
-  
+
   const lat = infoNegocio.value.latitud;
   const lng = infoNegocio.value.longitud;
-  
+
   // Aumentamos el zoom a 19 para ver más cerca
   return `https://www.google.com/maps?q=${lat},${lng}&z=19&output=embed&t=m`;
 });
@@ -32,11 +32,11 @@ const getDirectionsUrl = computed(() => {
   if (!infoNegocio.value?.latitud || !infoNegocio.value?.longitud) {
     return null;
   }
-  
+
   const lat = infoNegocio.value.latitud;
   const lng = infoNegocio.value.longitud;
   const nombre = encodeURIComponent(infoNegocio.value.nombre);
-  
+
   return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&destination_name=${nombre}`;
 });
 </script>
@@ -49,7 +49,10 @@ const getDirectionsUrl = computed(() => {
 
     <div class="grid gap-8 mt-8">
       <!-- Ubicación -->
-      <div v-if="infoNegocio?.direccion" class="bg-white rounded-2xl shadow-lg p-6">
+      <div
+        v-if="infoNegocio?.direccion"
+        class="bg-white rounded-2xl shadow-lg p-6"
+      >
         <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
           <MapPinIcon class="h-6 w-6 text-jati" />
           Ubicación
@@ -75,7 +78,7 @@ const getDirectionsUrl = computed(() => {
         </div>
 
         <!-- Mapa -->
-        <div 
+        <div
           v-if="infoNegocio?.latitud && infoNegocio?.longitud"
           class="relative h-[450px] rounded-2xl overflow-hidden shadow-lg mt-4"
         >

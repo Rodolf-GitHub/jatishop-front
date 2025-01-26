@@ -21,27 +21,28 @@
     </div>
 
     <!-- Estado de carga -->
-    <div v-if="isLoading" 
+    <div
+      v-if="isLoading"
       class="bg-gray-800 rounded-xl border border-gray-700 p-8"
     >
       <div class="flex flex-col items-center justify-center">
-        <svg 
-          class="animate-spin h-8 w-8 text-indigo-500 mb-4" 
-          xmlns="http://www.w3.org/2000/svg" 
-          fill="none" 
+        <svg
+          class="animate-spin h-8 w-8 text-indigo-500 mb-4"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
           viewBox="0 0 24 24"
         >
-          <circle 
-            class="opacity-25" 
-            cx="12" 
-            cy="12" 
-            r="10" 
-            stroke="currentColor" 
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
             stroke-width="4"
           />
-          <path 
-            class="opacity-75" 
-            fill="currentColor" 
+          <path
+            class="opacity-75"
+            fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           />
         </svg>
@@ -101,8 +102,15 @@
                 <FolderIcon class="w-8 h-8 text-gray-400" />
               </div>
               <div class="min-w-0 flex-1">
-                <h3 class="text-lg font-medium text-white truncate max-w-[200px]">{{ category.nombre }}</h3>
-                <p v-if="category.descripcion" class="text-sm text-gray-400 truncate max-w-[200px]">
+                <h3
+                  class="text-lg font-medium text-white truncate max-w-[200px]"
+                >
+                  {{ category.nombre }}
+                </h3>
+                <p
+                  v-if="category.descripcion"
+                  class="text-sm text-gray-400 truncate max-w-[200px]"
+                >
                   {{ category.descripcion }}
                 </p>
               </div>
@@ -132,7 +140,9 @@
 
         <!-- Sección de Subcategorías -->
         <div class="p-4 md:p-6">
-          <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div
+            class="flex flex-col md:flex-row justify-between items-center gap-4"
+          >
             <div class="flex items-center gap-2">
               <span class="text-gray-400">
                 {{ category.subcategorias?.length || 0 }} subcategorías
@@ -156,7 +166,7 @@
                   :class="{ 'rotate-180': category.isExpanded }"
                 />
                 <span class="text-sm">
-                  {{ category.isExpanded ? 'Ocultar' : 'Mostrar' }}
+                  {{ category.isExpanded ? "Ocultar" : "Mostrar" }}
                 </span>
               </button>
             </div>
@@ -190,9 +200,11 @@
                 >
                   <DocumentIcon class="w-6 h-6 text-gray-400" />
                 </div>
-                <span class="text-gray-300 truncate max-w-[200px]">{{ subcategory.nombre }}</span>
+                <span class="text-gray-300 truncate max-w-[200px]">{{
+                  subcategory.nombre
+                }}</span>
               </div>
-              
+
               <!-- Botones de acción de subcategoría -->
               <div class="flex gap-2 flex-shrink-0">
                 <button
@@ -225,14 +237,34 @@
     >
       <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md relative">
         <!-- Overlay de carga -->
-        <div v-if="isSubmitting" 
-          class="absolute inset-0 bg-gray-900/50 rounded-xl flex items-center justify-center z-10">
+        <div
+          v-if="isSubmitting"
+          class="absolute inset-0 bg-gray-900/50 rounded-xl flex items-center justify-center z-10"
+        >
           <div class="flex flex-col items-center gap-2">
-            <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              class="animate-spin h-8 w-8 text-indigo-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
-            <span class="text-white">{{ editingCategory ? 'Actualizando...' : 'Creando...' }}</span>
+            <span class="text-white">{{
+              editingCategory ? "Actualizando..." : "Creando..."
+            }}</span>
           </div>
         </div>
 
@@ -307,9 +339,25 @@
                 {{ editingCategory ? "Guardar Cambios" : "Crear Categoría" }}
               </span>
               <div v-else class="flex items-center gap-2">
-                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  class="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 <span>Procesando...</span>
               </div>
@@ -326,14 +374,34 @@
     >
       <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md relative">
         <!-- Overlay de carga -->
-        <div v-if="isSubmitting" 
-          class="absolute inset-0 bg-gray-900/50 rounded-xl flex items-center justify-center z-10">
+        <div
+          v-if="isSubmitting"
+          class="absolute inset-0 bg-gray-900/50 rounded-xl flex items-center justify-center z-10"
+        >
           <div class="flex flex-col items-center gap-2">
-            <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg
+              class="animate-spin h-8 w-8 text-indigo-500"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
             </svg>
-            <span class="text-white">{{ editingSubcategory ? 'Actualizando...' : 'Creando...' }}</span>
+            <span class="text-white">{{
+              editingSubcategory ? "Actualizando..." : "Creando..."
+            }}</span>
           </div>
         </div>
 
@@ -407,12 +475,30 @@
               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2"
             >
               <span v-if="!isSubmitting">
-                {{ editingSubcategory ? "Guardar Cambios" : "Crear Subcategoría" }}
+                {{
+                  editingSubcategory ? "Guardar Cambios" : "Crear Subcategoría"
+                }}
               </span>
               <div v-else class="flex items-center gap-2">
-                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  class="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 <span>Procesando...</span>
               </div>
@@ -437,7 +523,7 @@ import {
   FolderIcon,
   DocumentIcon,
 } from "@heroicons/vue/24/outline";
-import { emitter, EVENT_TYPES } from '@/utils/eventBus';
+import { emitter, EVENT_TYPES } from "@/utils/eventBus";
 
 const toast = useToast();
 const showAddModal = ref(false);
@@ -608,7 +694,7 @@ const saveSubcategory = async () => {
       await adminServices.updateSubcategory(
         selectedCategoryId.value,
         editingSubcategory.value.id,
-        formData
+        formData,
       );
       toast.success("Subcategoría actualizada correctamente");
     } else {
