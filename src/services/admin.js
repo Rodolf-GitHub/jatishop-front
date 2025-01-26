@@ -272,7 +272,11 @@ export const adminServices = {
 
   deleteProduct(id) {
     return adminApi.delete(`/mi-negocio/productos/${id}/manage_product/`);
-  }
+  },
+
+  getResumen() {
+    return adminApi.get('/mi-negocio/resumen/');
+  },
 };
 
 // Interceptor para manejar errores de autenticación
