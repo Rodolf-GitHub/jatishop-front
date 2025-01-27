@@ -82,18 +82,16 @@ const fetchProductos = async (page = 1) => {
   }
 };
 
-const loadMore = () => {
-  if (hasMore.value && !loading.value && !loadingMore.value) {
-    fetchProductos(currentPage.value);
-  }
-};
-
 const handleScroll = () => {
+  const scrollPosition = window.innerHeight + window.scrollY;
+  const documentHeight = document.documentElement.offsetHeight;
+
   if (
-    window.innerHeight + window.scrollY >=
-    document.documentElement.offsetHeight - 500
+    scrollPosition >= documentHeight - 500 &&
+    !loadingMore.value &&
+    hasMore.value
   ) {
-    loadMore();
+    fetchProductos(currentPage.value);
   }
 };
 
@@ -161,24 +159,33 @@ onUnmounted(() => {
         <p class="text-gray-600">No hay productos disponibles</p>
       </div>
 
-      <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <MarketplaceProductCard
-          v-for="producto in productos"
-          :key="producto.id"
-          :producto="producto"
-        />
-      </div>
+      <div v-else>
+        <!-- Grid de productos -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <MarketplaceProductCard
+            v-for="producto in productos"
+            :key="producto.id"
+            :producto="producto"
+          />
+        </div>
 
-      <!-- Loading more indicator -->
-      <div v-if="loadingMore" class="loading-more flex justify-center py-8">
-        <div class="relative">
-          <div
-            class="w-10 h-10 border-3 border-gray-700 border-t-indigo-500 rounded-full animate-spin"
-          ></div>
-          <div
-            class="w-10 h-10 border-3 border-transparent border-l-indigo-500 rounded-full animate-spin absolute top-0 left-0"
-            style="animation-direction: reverse; animation-duration: 1.5s"
-          ></div>
+        <!-- Loading more spinner -->
+        <div v-if="loadingMore" class="flex justify-center items-center py-8">
+          <div class="relative">
+            <div
+              class="w-8 h-8 border-4 border-gray-700 border-t-indigo-500 rounded-full animate-spin"
+            ></div>
+            <div
+              class="w-8 h-8 border-4 border-transparent border-l-indigo-500 rounded-full animate-spin absolute top-0 left-0"
+              style="animation-direction: reverse; animation-duration: 1.5s"
+            ></div>
+          </div>
+          <p class="text-sm text-gray-500 ml-2">Cargando más productos...</p>
+        </div>
+
+        <!-- Indicador de fin de productos -->
+        <div v-if="!hasMore && productos.length > 0" class="text-center py-8 text-gray-500">
+          No hay más productos para mostrar
         </div>
       </div>
     </div>
@@ -198,9 +205,16 @@ onUnmounted(() => {
   padding: 20px;
 }
 
-.loading-more {
-  text-align: center;
-  padding: 20px;
-  margin-top: 20px;
+@keyframes reverse-spin {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-reverse-spin {
+  animation: reverse-spin 1.5s linear infinite;
 }
 </style>
