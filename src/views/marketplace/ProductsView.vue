@@ -18,7 +18,7 @@ const hasMore = ref(true);
 
 const fetchProductos = async (page = 1) => {
   try {
-    if (loading.value || loadingMore.value) return;
+    if (loadingMore.value) return;
 
     if (page === 1) {
       loading.value = true;
@@ -38,10 +38,8 @@ const fetchProductos = async (page = 1) => {
     urlParams.append("page", page.toString());
 
     const url = `${API_URL}/marketplace/productos/?${urlParams.toString()}`;
-    console.log("Realizando petición a:", url);
 
     const response = await axios.get(url);
-    console.log("Respuesta de productos:", response.data.results);
 
     if (!response?.data?.results?.length) {
       hasMore.value = false;
@@ -61,7 +59,7 @@ const fetchProductos = async (page = 1) => {
       tienda_nombre: producto.negocio?.nombre,
       tienda_slug: producto.negocio?.slug,
       tienda_id: producto.negocio?.id,
-      negocio: producto.negocio
+      negocio: producto.negocio,
     }));
 
     if (page === 1) {
@@ -74,9 +72,9 @@ const fetchProductos = async (page = 1) => {
     if (hasMore.value) {
       currentPage.value = page + 1;
     }
-
   } catch (err) {
     console.error("Error:", err);
+    error.value = "Error al cargar los productos";
     hasMore.value = false;
   } finally {
     loading.value = false;
@@ -86,7 +84,6 @@ const fetchProductos = async (page = 1) => {
 
 const loadMore = () => {
   if (hasMore.value && !loading.value && !loadingMore.value) {
-    console.log("Cargando página:", currentPage.value);
     fetchProductos(currentPage.value);
   }
 };
@@ -133,10 +130,19 @@ onUnmounted(() => {
 <template>
   <div class="products-container max-w-7xl mx-auto">
     <!-- Loading state -->
-    <div v-if="loading" class="loading">
-      <div
-        class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto"
-      ></div>
+    <div
+      v-if="loading"
+      class="loading flex flex-col items-center justify-center p-12"
+    >
+      <div class="relative">
+        <div
+          class="w-16 h-16 border-4 border-gray-700 border-t-indigo-500 rounded-full animate-spin"
+        ></div>
+        <div
+          class="w-16 h-16 border-4 border-transparent border-l-indigo-500 rounded-full animate-spin absolute top-0 left-0"
+          style="animation-direction: reverse; animation-duration: 1.5s"
+        ></div>
+      </div>
       <p class="mt-4 text-gray-600">Cargando productos...</p>
     </div>
 
@@ -147,10 +153,15 @@ onUnmounted(() => {
 
     <!-- Products grid -->
     <div v-else class="products-grid">
+      <!-- Solo mostrar el mensaje de no productos cuando no está cargando y la lista está vacía -->
       <div
-        v-if="loading || productos.length > 0"
-        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"
+        v-if="!loading && productos.length === 0"
+        class="no-products bg-gray-50 rounded-lg p-8 text-center"
       >
+        <p class="text-gray-600">No hay productos disponibles</p>
+      </div>
+
+      <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <MarketplaceProductCard
           v-for="producto in productos"
           :key="producto.id"
@@ -158,16 +169,17 @@ onUnmounted(() => {
         />
       </div>
 
-      <div v-else class="no-products bg-gray-50 rounded-lg p-8 text-center">
-        <p class="text-gray-600">No hay productos disponibles</p>
-      </div>
-
       <!-- Loading more indicator -->
-      <div v-if="loadingMore" class="loading-more">
-        <div
-          class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mx-auto"
-        ></div>
-        <p class="mt-2 text-gray-600">Cargando más productos...</p>
+      <div v-if="loadingMore" class="loading-more flex justify-center py-8">
+        <div class="relative">
+          <div
+            class="w-10 h-10 border-3 border-gray-700 border-t-indigo-500 rounded-full animate-spin"
+          ></div>
+          <div
+            class="w-10 h-10 border-3 border-transparent border-l-indigo-500 rounded-full animate-spin absolute top-0 left-0"
+            style="animation-direction: reverse; animation-duration: 1.5s"
+          ></div>
+        </div>
       </div>
     </div>
   </div>

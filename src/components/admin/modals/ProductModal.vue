@@ -405,12 +405,20 @@ watch(
   () => props.editingProduct,
   (product) => {
     if (product) {
-      // Primero seleccionamos la categoría completa, no solo el ID
-      selectedCategory.value = product.categoria?.id;
+      console.log("Producto seleccionado:", product);
+      
+      // Encontrar y seleccionar la categoría correcta
+      const categoriaEncontrada = props.categories.find(
+        cat => cat.id === product.subcategoria.categoria.id
+      );
+      
+      if (categoriaEncontrada) {
+        selectedCategory.value = categoriaEncontrada;
+        // Ahora seleccionamos el ID de la subcategoría
+        selectedSubcategory.value = product.subcategoria.id;
+      }
 
-      // Luego seleccionamos la subcategoría
-      selectedSubcategory.value = product.subcategoria?.id;
-
+      // Resto del formulario
       form.value = {
         nombre: product.nombre || "",
         descripcion: product.descripcion || "",
@@ -426,7 +434,7 @@ watch(
       }
     }
   },
-  { immediate: true },
+  { immediate: true }
 );
 </script>
 

@@ -19,27 +19,28 @@
     </div>
 
     <!-- Estado de carga -->
-    <div v-if="isLoading" 
+    <div
+      v-if="isLoading"
       class="bg-gray-800 rounded-xl border border-gray-700 p-8"
     >
       <div class="flex flex-col items-center justify-center">
-        <svg 
-          class="animate-spin h-8 w-8 text-indigo-500 mb-4" 
-          xmlns="http://www.w3.org/2000/svg" 
-          fill="none" 
+        <svg
+          class="animate-spin h-8 w-8 text-indigo-500 mb-4"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
           viewBox="0 0 24 24"
         >
-          <circle 
-            class="opacity-25" 
-            cx="12" 
-            cy="12" 
-            r="10" 
-            stroke="currentColor" 
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
             stroke-width="4"
           />
-          <path 
-            class="opacity-75" 
-            fill="currentColor" 
+          <path
+            class="opacity-75"
+            fill="currentColor"
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           />
         </svg>
@@ -123,7 +124,11 @@
                       {{ product.nombre }}
                     </div>
                     <div class="text-sm text-gray-400 line-clamp-1">
-                      {{ product.descripcion ? product.descripcion.substring(0,10) + '...' : "Sin descripción" }}
+                      {{
+                        product.descripcion
+                          ? product.descripcion.substring(0, 10) + "..."
+                          : "Sin descripción"
+                      }}
                     </div>
                   </div>
                 </div>
@@ -322,7 +327,7 @@ import {
   PhotoIcon,
   PlusCircleIcon,
 } from "@heroicons/vue/24/outline";
-import { emitter, EVENT_TYPES } from '@/utils/eventBus';
+import { emitter, EVENT_TYPES } from "@/utils/eventBus";
 
 const toast = useToast();
 const showAddModal = ref(false);
@@ -393,7 +398,7 @@ const loadCategories = async () => {
 // Cargar productos
 const loadProducts = async () => {
   try {
-  isLoading.value = true;
+    isLoading.value = true;
     const response = await adminServices.getMyProducts();
     products.value = response.data;
   } catch (error) {
@@ -449,7 +454,7 @@ const editProduct = (product) => {
   editingProduct.value = product;
 
   // Primero seleccionamos la categoría
-  selectedCategory.value = product.subcategoria.categoria;
+  selectedCategory.value = product.subcategoria.categoria.id;
 
   // Luego seleccionamos la subcategoría
   selectedSubcategory.value = product.subcategoria.id;
