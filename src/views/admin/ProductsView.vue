@@ -359,7 +359,7 @@ const itemsPerPage = ref(10);
 // Computed properties para la paginación
 const totalItems = computed(() => products.value.length);
 const totalPages = computed(() =>
-  Math.ceil(totalItems.value / itemsPerPage.value)
+  Math.ceil(totalItems.value / itemsPerPage.value),
 );
 
 // Computed para obtener los productos de la página actual
@@ -489,7 +489,7 @@ const deleteProduct = async (productId) => {
 const selectedCategorySubcategories = computed(() => {
   if (!selectedCategory.value) return [];
   const category = categories.value.find(
-    (cat) => cat.id === selectedCategory.value
+    (cat) => cat.id === selectedCategory.value,
   );
   return category ? category.subcategorias : [];
 });

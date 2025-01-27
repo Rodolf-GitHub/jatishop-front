@@ -941,10 +941,10 @@ const getBannerUrl = (banner) => {
 
 // Limpiar las URLs de previsualización cuando el componente se desmonte
 onUnmounted(() => {
-  if (previewLogo.value && previewLogo.value.startsWith('blob:')) {
+  if (previewLogo.value && previewLogo.value.startsWith("blob:")) {
     URL.revokeObjectURL(previewLogo.value);
   }
-  if (previewPortada.value && previewPortada.value.startsWith('blob:')) {
+  if (previewPortada.value && previewPortada.value.startsWith("blob:")) {
     URL.revokeObjectURL(previewPortada.value);
   }
 });

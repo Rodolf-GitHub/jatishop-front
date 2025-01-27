@@ -406,12 +406,12 @@ watch(
   (product) => {
     if (product) {
       console.log("Producto seleccionado:", product);
-      
+
       // Encontrar y seleccionar la categoría correcta
       const categoriaEncontrada = props.categories.find(
-        cat => cat.id === product.subcategoria.categoria.id
+        (cat) => cat.id === product.subcategoria.categoria.id,
       );
-      
+
       if (categoriaEncontrada) {
         selectedCategory.value = categoriaEncontrada;
         // Ahora seleccionamos el ID de la subcategoría
@@ -434,7 +434,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 

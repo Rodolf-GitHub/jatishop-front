@@ -102,7 +102,7 @@ watch(
   () => {
     fetchProductos();
   },
-  { deep: true }
+  { deep: true },
 );
 
 watch(
@@ -114,7 +114,7 @@ watch(
       fetchProductos(1);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onMounted(() => {

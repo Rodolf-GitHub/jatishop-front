@@ -8,33 +8,33 @@ const router = useRouter();
 const props = defineProps({
   producto: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const navigateToStore = () => {
   if (!props.producto?.negocio?.slug) {
-    console.error('Error: slug de negocio no disponible', props.producto);
+    console.error("Error: slug de negocio no disponible", props.producto);
     return;
   }
 
   // Simplemente navegamos a la ruta de detalles del producto
   router.push({
-    name: 'store-producto',
+    name: "store-producto",
     params: {
       slug: props.producto.negocio.slug,
-      productoId: props.producto.id.toString()
-    }
+      productoId: props.producto.id.toString(),
+    },
   });
 };
 </script>
 
 <template>
-  <div 
+  <div
     @click="navigateToStore"
     class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] relative flex flex-col cursor-pointer h-full"
     :style="{
-      background: `linear-gradient(to bottom, ${producto.negocio?.tema?.color_primario}05, ${producto.negocio?.tema?.color_secundario}10)`
+      background: `linear-gradient(to bottom, ${producto.negocio?.tema?.color_primario}05, ${producto.negocio?.tema?.color_secundario}10)`,
     }"
   >
     <!-- Imagen y badge de descuento -->
@@ -50,7 +50,7 @@ const navigateToStore = () => {
         class="absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-bold shadow-lg"
         :style="{
           background: `linear-gradient(45deg, ${producto.negocio?.tema?.color_primario}, ${producto.negocio?.tema?.color_secundario})`,
-          color: 'white'
+          color: 'white',
         }"
       >
         -{{ producto.descuento }}%
@@ -58,13 +58,14 @@ const navigateToStore = () => {
     </div>
 
     <!-- Info -->
-    <div class="p-4 flex flex-col flex-grow" 
+    <div
+      class="p-4 flex flex-col flex-grow"
       :style="{
-        background: `linear-gradient(to bottom, transparent, ${producto.negocio?.tema?.color_primario}05)`
+        background: `linear-gradient(to bottom, transparent, ${producto.negocio?.tema?.color_primario}05)`,
       }"
     >
-      <p 
-        v-if="producto.tienda_nombre" 
+      <p
+        v-if="producto.tienda_nombre"
         class="text-sm font-medium mb-2 hover:opacity-80 transition-opacity truncate"
         :style="{ color: producto.negocio?.tema?.color_primario }"
       >
@@ -78,7 +79,7 @@ const navigateToStore = () => {
       <div class="mt-auto space-y-2">
         <!-- Precio -->
         <div class="flex items-baseline gap-2">
-          <span 
+          <span
             class="text-xl font-bold"
             :style="{ color: producto.negocio?.tema?.color_primario }"
           >
@@ -94,11 +95,11 @@ const navigateToStore = () => {
 
         <!-- Stock indicator -->
         <div class="flex items-center gap-2">
-          <span 
+          <span
             class="text-xs font-medium px-3 py-1.5 rounded-full"
             :style="{
               background: `linear-gradient(45deg, ${producto.negocio?.tema?.color_primario}15, ${producto.negocio?.tema?.color_secundario}15)`,
-              color: producto.negocio?.tema?.color_primario
+              color: producto.negocio?.tema?.color_primario,
             }"
           >
             {{ producto.stock }} disponibles
@@ -118,10 +119,14 @@ const navigateToStore = () => {
 }
 
 .product-card {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.025);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.05),
+    0 2px 4px -2px rgb(0 0 0 / 0.025);
 }
 
 .product-card:hover {
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.05);
 }
-</style> 
+</style>
