@@ -68,6 +68,22 @@
             <span>Productos</span>
           </router-link>
         </div>
+
+        <!-- Pedidos -->
+        <div class="relative" v-if="setupProgress.subcategoria">
+          <router-link
+            to="/admin/orders"
+            class="group flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"
+            :class="[
+              setupProgress.producto
+                ? 'text-gray-300 hover:bg-gray-700 hover:text-indigo-400'
+                : 'text-gray-500',
+            ]"
+          >
+            <ShoppingCartIcon class="w-6 h-6 flex-shrink-0" />
+            <span>Pedidos</span>
+          </router-link>
+        </div>
       </nav>
 
       <!-- Mensajes informativos -->
@@ -112,6 +128,7 @@ import {
   BuildingStorefrontIcon,
   TagIcon,
   CubeIcon,
+  ShoppingCartIcon,
 } from "@heroicons/vue/24/outline";
 
 const route = useRoute();
