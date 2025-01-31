@@ -70,7 +70,7 @@
         </div>
 
         <!-- Pedidos -->
-        <div class="relative" v-if="setupProgress.subcategoria">
+        <div class="relative" v-if="setupProgress.producto">
           <router-link
             to="/admin/orders"
             class="group flex items-center gap-3 px-4 py-3 rounded-lg transition-colors"

@@ -11,6 +11,7 @@ import {
 import { useRouter, useRoute } from "vue-router";
 import CheckoutModal from "./CheckoutModal.vue";
 import IconWhatsApp from "@/components/icons/IconWhatsApp.vue";
+import CreateOrderModal from "./CreateOrderModal.vue";
 
 const cartStore = useCartStore();
 const showCart = ref(false);
@@ -63,6 +64,12 @@ const handleEscKey = (event) => {
 const generateWhatsAppLink = () => {
   if (!infoNegocio.value?.whatsapp) return "#";
   return `${infoNegocio.value.whatsapp}`;
+};
+
+const handleOrderSuccess = (orderData) => {
+  // Aquí puedes manejar el éxito de la creación del pedido
+  // Por ejemplo, mostrar un mensaje de éxito, redirigir, etc.
+  showCart.value = false;
 };
 
 onMounted(async () => {
@@ -237,12 +244,20 @@ onUnmounted(() => {
     </div>
 
     <!-- Modal de checkout -->
-    <CheckoutModal
+    <!-- <CheckoutModal
       :show-modal="showCheckoutModal"
       :info-negocio="infoNegocio"
       :cart-items="cartStore.items"
       :total-amount="totalAmount"
       @close="showCheckoutModal = false"
+    /> -->
+
+    <CreateOrderModal
+      v-if="showCheckoutModal"
+      :show-modal="showCheckoutModal"
+      :info-negocio="infoNegocio"
+      @close="showCheckoutModal = false"
+      @success="handleOrderSuccess"
     />
   </div>
 </template>

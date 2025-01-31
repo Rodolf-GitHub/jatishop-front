@@ -20,7 +20,7 @@ adminApi.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 export const adminServices = {
@@ -38,7 +38,7 @@ export const adminServices = {
           email: response.data.email,
           username: response.data.username,
           negocio: response.data.negocio,
-        }),
+        })
       );
     }
     return response;
@@ -68,7 +68,7 @@ export const adminServices = {
         headers: {
           Authorization: `Token ${token}`,
         },
-      },
+      }
     );
   },
 
@@ -117,11 +117,11 @@ export const adminServices = {
           // Manejar el objeto tema
           formData.append(
             "color_primario",
-            data[key].color_primario || "#8E44AD",
+            data[key].color_primario || "#8E44AD"
           );
           formData.append(
             "color_secundario",
-            data[key].color_secundario || "#E67E22",
+            data[key].color_secundario || "#E67E22"
           );
         } else if (typeof data[key] === "boolean") {
           formData.append(key, data[key].toString());
@@ -187,7 +187,7 @@ export const adminServices = {
       return Promise.reject("Provincia es requerida");
     }
     return adminApi.get(
-      `/ubicaciones/municipios/${encodeURIComponent(provincia)}/`,
+      `/ubicaciones/municipios/${encodeURIComponent(provincia)}/`
     );
   },
 
@@ -214,7 +214,7 @@ export const adminServices = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      },
+      }
     );
   },
 
@@ -235,7 +235,7 @@ export const adminServices = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      },
+      }
     );
   },
 
@@ -247,13 +247,13 @@ export const adminServices = {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      },
+      }
     );
   },
 
   deleteSubcategory(categoryId, subcategoryId) {
     return adminApi.delete(
-      `/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`,
+      `/mi-negocio/categorias/${categoryId}/subcategories/${subcategoryId}/`
     );
   },
 
@@ -279,7 +279,7 @@ export const adminServices = {
           "Content-Type": "multipart/form-data",
         },
         timeout: 0,
-      },
+      }
     );
   },
 
@@ -289,6 +289,84 @@ export const adminServices = {
 
   getResumen() {
     return adminApi.get("/mi-negocio/resumen/");
+  },
+
+  // Pedidos
+  getOrders() {
+    return adminApi.get("/mi-negocio/pedidos/");
+  },
+
+  createOrder(orderData) {
+    const {
+      nombre_cliente,
+      email_cliente,
+      telefono_cliente,
+      direccion_entrega,
+      productos,
+      metodo_pago,
+      nota_comprador,
+    } = orderData;
+
+    // Verificar que productos no esté vacío
+    if (!productos || productos.length === 0) {
+      return Promise.reject(
+        new Error("El pedido debe tener al menos un producto.")
+      );
+    }
+
+    return adminApi.post("/mi-negocio/pedidos/", {
+      nombre_cliente,
+      email_cliente,
+      telefono_cliente,
+      direccion_entrega,
+      productos,
+      metodo_pago,
+      nota_comprador,
+    });
+  },
+
+  // Obtener un pedido por ID
+  getOrderById(id) {
+    return adminApi.get(`/mi-negocio/pedidos/${id}/`);
+  },
+
+  // Actualizar un pedido existente
+  updateOrder(id, orderData) {
+    const {
+      nombre_cliente,
+      email_cliente,
+      telefono_cliente,
+      direccion_entrega,
+      estado,
+      metodo_pago,
+      nota_comprador,
+      nota_vendedor,
+    } = orderData;
+
+    // Solo enviamos los campos que pueden ser actualizados
+    const updateData = {};
+    if (nombre_cliente) updateData.nombre_cliente = nombre_cliente;
+    if (email_cliente) updateData.email_cliente = email_cliente;
+    if (telefono_cliente) updateData.telefono_cliente = telefono_cliente;
+    if (direccion_entrega) updateData.direccion_entrega = direccion_entrega;
+    if (estado) updateData.estado = estado;
+    if (metodo_pago) updateData.metodo_pago = metodo_pago;
+    if (nota_comprador !== undefined)
+      updateData.nota_comprador = nota_comprador;
+    if (nota_vendedor !== undefined) updateData.nota_vendedor = nota_vendedor;
+
+    return adminApi.patch(`/mi-negocio/pedidos/${id}/`, updateData);
+  },
+
+  // Nuevos servicios
+  deleteOrder(id) {
+    return adminApi.delete(`/mi-negocio/pedidos/${id}/`);
+  },
+
+  updateOrderStatus(id, status) {
+    return adminApi.post(`/mi-negocio/pedidos/${id}/actualizar_estado/`, {
+      estado: status,
+    });
   },
 };
 
@@ -301,7 +379,7 @@ adminApi.interceptors.response.use(
       localStorage.removeItem("admin_user");
     }
     return Promise.reject(error);
-  },
+  }
 );
 
 export default adminApi;

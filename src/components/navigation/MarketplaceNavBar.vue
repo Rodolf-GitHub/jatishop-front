@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useMarketplaceStore } from "@/stores/marketplace";
 import InfoBanner from "@/components/InfoBanner.vue";
 import {
@@ -13,6 +13,7 @@ import {
 import UbicacionModal from "@/components/marketplace/UbicacionModal.vue";
 
 const route = useRoute();
+const router = useRouter();
 const marketplaceStore = useMarketplaceStore();
 const showUbicacionModal = ref(false);
 const ubicacionActual = ref(null);
@@ -37,6 +38,20 @@ const navigation = [
 
 const isCurrentRoute = (routeName) => {
   return route.name === routeName;
+};
+
+// Función para verificar si el usuario está logueado
+const isUserLoggedIn = () => {
+  return !!localStorage.getItem('admin_token');
+};
+
+// Función para manejar el clic en Mi Tienda
+const handleStoreClick = () => {
+  if (isUserLoggedIn()) {
+    router.push('/admin/home'); // O la ruta que uses para el panel
+  } else {
+    router.push('/admin'); // Ruta de login
+  }
 };
 
 const handleUbicacionUpdate = async (nuevaUbicacion) => {
@@ -102,14 +117,14 @@ onMounted(async () => {
             </button>
 
             <!-- Botón de mi tienda -->
-            <router-link
-              to="/admin"
+            <button
+              @click="handleStoreClick"
               class="flex items-center gap-1 px-2 py-1.5 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all text-xs sm:text-sm"
               title="Mi Tienda"
             >
               <ShoppingBagIcon class="h-4 w-4" />
-              <span>Mi Tienda</span>
-            </router-link>
+              <span>{{ isUserLoggedIn() ? 'Panel Admin' : 'Mi Tienda' }}</span>
+            </button>
           </div>
         </div>
 

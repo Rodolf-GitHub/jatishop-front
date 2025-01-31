@@ -75,102 +75,133 @@
     </div>
 
     <!-- Tabla de Pedidos -->
-    <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-x-auto">
-      <table class="w-full">
-        <thead>
-          <tr class="bg-gray-750">
-            <th class="px-4 md:px-6 py-4 text-left text-sm font-medium text-gray-400">
-              Pedido
-            </th>
-            <th class="px-4 md:px-6 py-4 text-left text-sm font-medium text-gray-400">
-              Cliente
-            </th>
-            <th class="hidden md:table-cell px-6 py-4 text-left text-sm font-medium text-gray-400">
-              Fecha
-            </th>
-            <th class="px-4 md:px-6 py-4 text-left text-sm font-medium text-gray-400">
-              Total
-            </th>
-            <th class="px-4 md:px-6 py-4 text-left text-sm font-medium text-gray-400">
-              Estado
-            </th>
-            <th class="px-4 md:px-6 py-4 text-right text-sm font-medium text-gray-400">
-              Acciones
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-700">
-          <tr
-            v-for="order in orders"
-            :key="order.id"
-            class="hover:bg-gray-750 cursor-pointer"
-            @click="showOrderDetails(order)"
-          >
-            <td class="px-4 md:px-6 py-4">
-              <div class="text-white font-medium">#{{ order.id }}</div>
-              <div class="text-sm text-gray-400">
-                {{ order.items.length }} productos
-              </div>
-            </td>
-            <td class="px-4 md:px-6 py-4">
-              <div class="text-white">{{ order.nombre_cliente }}</div>
-              <div class="text-sm text-gray-400">
-                {{ order.email_cliente }}
-              </div>
-            </td>
-            <td class="hidden md:table-cell px-6 py-4">
-              <div class="text-white">{{ formatDate(order.fecha_pedido) }}</div>
-              <div class="text-sm text-gray-400">
-                {{ formatTime(order.fecha_pedido) }}
-              </div>
-            </td>
-            <td class="px-4 md:px-6 py-4 text-white font-medium">
-              ${{ parseFloat(order.total).toFixed(2) }}
-            </td>
-            <td class="px-4 md:px-6 py-4">
-              <span
-                class="px-2 py-1 text-xs rounded-full"
-                :class="getStatusClass(order.estado)"
-              >
-                {{ order.estado_display }}
-              </span>
-            </td>
-            <td class="px-4 md:px-6 py-4">
-              <div class="flex justify-end gap-3">
-                <button
-                  @click.stop="updateOrderStatus(order)"
-                  class="text-gray-400 hover:text-white"
+    <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-gray-750">
+              <th class="px-4 md:px-6 py-4 text-left text-sm font-medium text-gray-400">
+                Pedido
+              </th>
+              <th class="px-4 md:px-6 py-4 text-left text-sm font-medium text-gray-400">
+                Cliente
+              </th>
+              <th class="hidden md:table-cell px-6 py-4 text-left text-sm font-medium text-gray-400">
+                Fecha
+              </th>
+              <th class="px-4 md:px-6 py-4 text-left text-sm font-medium text-gray-400">
+                Total
+              </th>
+              <th class="px-4 md:px-6 py-4 text-left text-sm font-medium text-gray-400">
+                Estado
+              </th>
+              <th class="px-4 md:px-6 py-4 text-right text-sm font-medium text-gray-400">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-700">
+            <!-- Mensaje cuando no hay pedidos -->
+            <tr v-if="!loading && orders.length === 0">
+              <td colspan="6" class="px-4 md:px-6 py-8 text-center text-gray-400">
+                <div class="flex flex-col items-center gap-2">
+                  <ShoppingBagIcon class="w-12 h-12 text-gray-600" />
+                  <p class="text-lg">No hay pedidos disponibles</p>
+                  <p class="text-sm">Los pedidos que recibas aparecerán aquí</p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Lista de pedidos -->
+            <tr
+              v-for="order in paginatedOrders"
+              :key="order.id"
+              class="hover:bg-gray-750 cursor-pointer"
+              @click="showOrderDetails(order)"
+            >
+              <td class="px-4 md:px-6 py-4">
+                <div class="text-white font-medium">#{{ order.id }}</div>
+                <div class="text-sm text-gray-400">
+                  {{ order.items.length }} productos
+                </div>
+              </td>
+              <td class="px-4 md:px-6 py-4">
+                <div class="text-white">{{ order.nombre_cliente }}</div>
+                <div class="text-sm text-gray-400">
+                  {{ order.email_cliente }}
+                </div>
+              </td>
+              <td class="hidden md:table-cell px-6 py-4">
+                <div class="text-white">{{ formatDate(order.fecha_pedido) }}</div>
+                <div class="text-sm text-gray-400">
+                  {{ formatTime(order.fecha_pedido) }}
+                </div>
+              </td>
+              <td class="px-4 md:px-6 py-4 text-white font-medium">
+                ${{ parseFloat(order.total).toFixed(2) }}
+              </td>
+              <td class="px-4 md:px-6 py-4">
+                <span
+                  class="px-2 py-1 text-xs rounded-full"
+                  :class="getStatusClass(order.estado)"
                 >
-                  <PencilSquareIcon class="w-5 h-5" />
-                </button>
-                <button
-                  @click.stop="printOrder(order.id)"
-                  class="text-gray-400 hover:text-white"
-                >
-                  <PrinterIcon class="w-5 h-5" />
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                  {{ order.estado }}
+                </span>
+              </td>
+              <td class="px-4 md:px-6 py-4">
+                <div class="flex justify-end gap-3">
+                  <button
+                    @click.stop="$refs.statusSelect.click()"
+                    class="text-gray-400 hover:text-white"
+                  >
+                    <PencilSquareIcon class="w-5 h-5" />
+                  </button>
+                  <select
+                    ref="statusSelect"
+                    :value="order.estado"
+                    @change="updateOrderStatus(order, $event.target.value)"
+                    @click.stop
+                    class="hidden"
+                  >
+                    <option v-for="state in availableStates" 
+                            :key="state.value" 
+                            :value="state.value">
+                      {{ state.label }}
+                    </option>
+                  </select>
+                  <button
+                    @click.stop="printOrder(order.id)"
+                    class="text-gray-400 hover:text-white"
+                  >
+                    <PrinterIcon class="w-5 h-5" />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- Paginación -->
       <div
+        v-if="orders.length > 0"
         class="px-4 md:px-6 py-4 border-t border-gray-700 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0"
       >
         <div class="text-sm text-gray-400">
-          Mostrando 1-10 de {{ totalOrders }} pedidos
+          Mostrando {{ ((currentPage - 1) * itemsPerPage) + 1 }}-{{ Math.min(currentPage * itemsPerPage, orders.length) }} de {{ orders.length }} pedidos
         </div>
         <div class="flex gap-2">
           <button
-            class="px-3 py-1 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600"
+            @click="previousPage"
+            class="px-3 py-1 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             :disabled="currentPage === 1"
           >
             Anterior
           </button>
           <button
-            class="px-3 py-1 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600"
+            @click="nextPage"
+            class="px-3 py-1 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            :disabled="currentPage === totalPages"
           >
             Siguiente
           </button>
@@ -202,7 +233,7 @@
                       class="px-3 py-1 text-sm rounded-full"
                       :class="getStatusClass(selectedOrder.estado)"
                     >
-                      {{ selectedOrder.estado_display }}
+                      {{ selectedOrder.estado }}
                     </span>
                   </div>
                   <p class="text-sm text-gray-400 mt-1">
@@ -246,11 +277,11 @@
                 </h3>
                 <div class="space-y-1">
                   <div class="text-white text-lg">{{ selectedOrder.direccion_entrega }}</div>
-                  <div class="text-gray-400 mt-2">
+                  <!-- <div class="text-gray-400 mt-2">
                     <span class="px-2 py-1 bg-gray-700/50 rounded-lg text-sm">
                       {{ selectedOrder.negocio_nombre }}
                     </span>
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </div>
@@ -299,7 +330,7 @@
                 <h3 class="text-sm font-medium text-gray-400 mb-2 flex items-center gap-2">
                   <CreditCardIcon class="w-5 h-5 text-indigo-400" /> Método de Pago
                 </h3>
-                <p class="text-white">{{ selectedOrder.metodo_pago_display }}</p>
+                <p class="text-white">{{ selectedOrder.metodo_pago.charAt(0).toUpperCase() + selectedOrder.metodo_pago.slice(1) }}</p>
               </div>
             </div>
 
@@ -309,6 +340,22 @@
                 <span class="text-lg font-medium text-white">Total del Pedido</span>
                 <span class="text-xl font-bold text-indigo-400">${{ parseFloat(selectedOrder.total).toFixed(2) }}</span>
               </div>
+            </div>
+
+            <!-- Añadir selector de estado en el header del modal -->
+            <div class="flex items-center gap-3 mt-4">
+              <span class="text-gray-400">Cambiar estado:</span>
+              <select
+                :value="selectedOrder.estado"
+                @change="updateOrderStatus(selectedOrder, $event.target.value)"
+                class="px-3 py-1 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:border-indigo-500"
+              >
+                <option v-for="state in availableStates" 
+                        :key="state.value" 
+                        :value="state.value">
+                  {{ state.label }}
+                </option>
+              </select>
             </div>
           </div>
 
@@ -333,11 +380,22 @@
         </div>
       </div>
     </div>
+
+    <!-- Loading state -->
+    <div v-if="loading" class="text-center py-8">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto"></div>
+    </div>
+
+    <!-- Error state -->
+    <div v-if="error" class="text-center py-8 text-red-500">
+      {{ error }}
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { adminServices } from "@/services/admin";
 import {
   UserIcon,
   TruckIcon,
@@ -350,16 +408,78 @@ import {
   CreditCardIcon
 } from "@heroicons/vue/24/outline";
 
+const orders = ref([]);
 const currentPage = ref(1);
-const totalOrders = ref(45);
+const itemsPerPage = 10;
 const selectedOrder = ref(null);
+const loading = ref(false);
+const error = ref(null);
 
-const orderStats = ref([
-  { label: "Hoy", value: "2", color: "text-blue-400" },
-  { label: "Pendientes", value: "1", color: "text-yellow-400" },
-  { label: "En Proceso", value: "1", color: "text-blue-400" },
-  { label: "Completados", value: "1", color: "text-green-400" }
-]);
+// Computed properties para la paginación
+const totalPages = computed(() => Math.ceil((orders.value?.length || 0) / itemsPerPage));
+const paginatedOrders = computed(() => {
+  if (!orders.value) return [];
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return orders.value.slice(start, end);
+});
+
+// Funciones de paginación
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const previousPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+// Estados disponibles para el select
+const availableStates = [
+  { value: 'pendiente', label: 'Pendiente' },
+  { value: 'en_proceso', label: 'En Proceso' },
+  { value: 'enviado', label: 'Enviado' },
+  { value: 'entregado', label: 'Entregado' },
+  { value: 'cancelado', label: 'Cancelado' }
+];
+
+// Computed para las estadísticas
+const orderStats = computed(() => {
+  if (!orders.value) return [];
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const stats = {
+    hoy: orders.value.filter(order => {
+      const orderDate = new Date(order.fecha_pedido);
+      orderDate.setHours(0, 0, 0, 0);
+      return orderDate.getTime() === today.getTime();
+    }).length,
+    
+    pendientes: orders.value.filter(order => 
+      order.estado === 'pendiente'
+    ).length,
+    
+    en_proceso: orders.value.filter(order => 
+      order.estado === 'en_proceso'
+    ).length,
+    
+    completados: orders.value.filter(order => 
+      order.estado === 'entregado'
+    ).length
+  };
+
+  return [
+    { label: "Hoy", value: stats.hoy.toString(), color: "text-blue-400" },
+    { label: "Pendientes", value: stats.pendientes.toString(), color: "text-yellow-400" },
+    { label: "En Proceso", value: stats.en_proceso.toString(), color: "text-blue-400" },
+    { label: "Completados", value: stats.completados.toString(), color: "text-green-400" }
+  ];
+});
 
 const filters = ref({
   search: "",
@@ -368,151 +488,40 @@ const filters = ref({
   sort: "newest",
 });
 
-const orders = ref([
-  {
-    id: "1001",
-    nombre_cliente: "Juan Pérez",
-    email_cliente: "juan.perez@example.com",
-    telefono_cliente: "+34 612 345 678",
-    direccion_entrega: "Calle Mayor 123, 2º B",
-    negocio: 1,
-    negocio_nombre: "Tienda Central",
-    items: [
-      {
-        id: 1,
-        producto: 101,
-        producto_nombre: "iPhone 14 Pro",
-        producto_precio: "999.99",
-        cantidad: 1,
-        precio_unitario: "999.99",
-        subtotal: "999.99"
-      },
-      {
-        id: 2,
-        producto: 102,
-        producto_nombre: "AirPods Pro",
-        producto_precio: "249.99",
-        cantidad: 2,
-        precio_unitario: "249.99",
-        subtotal: "499.98"
-      }
-    ],
-    fecha_pedido: "2024-03-28T10:30:00.000Z",
-    estado: "pendiente",
-    estado_display: "Pendiente",
-    metodo_pago: "tarjeta",
-    metodo_pago_display: "Tarjeta de Crédito",
-    nota_comprador: "Por favor, llamar antes de entregar",
-    nota_vendedor: "Cliente VIP",
-    total: "1499.97",
-    updated_at: "2024-03-28T10:30:00.000Z"
-  },
-  {
-    id: "1002",
-    nombre_cliente: "María García",
-    email_cliente: "maria.garcia@example.com",
-    telefono_cliente: "+34 623 456 789",
-    direccion_entrega: "Avenida Principal 45, 5º A",
-    negocio: 2,
-    negocio_nombre: "Tienda Norte",
-    items: [
-      {
-        id: 3,
-        producto: 201,
-        producto_nombre: "MacBook Air M2",
-        producto_precio: "1299.99",
-        cantidad: 1,
-        precio_unitario: "1299.99",
-        subtotal: "1299.99"
-      }
-    ],
-    fecha_pedido: "2024-03-27T15:45:00.000Z",
-    estado: "en_proceso",
-    estado_display: "En Proceso",
-    metodo_pago: "efectivo",
-    metodo_pago_display: "Efectivo",
-    nota_comprador: "",
-    nota_vendedor: "Entregar en horario de tarde",
-    total: "1299.99",
-    updated_at: "2024-03-27T16:00:00.000Z"
-  },
-  {
-    id: "1003",
-    nombre_cliente: "Carlos Rodríguez",
-    email_cliente: "carlos.rodriguez@example.com",
-    telefono_cliente: "+34 634 567 890",
-    direccion_entrega: "Plaza España 78",
-    negocio: 1,
-    negocio_nombre: "Tienda Central",
-    items: [
-      {
-        id: 4,
-        producto: 301,
-        producto_nombre: "iPad Air",
-        producto_precio: "599.99",
-        cantidad: 1,
-        precio_unitario: "599.99",
-        subtotal: "599.99"
-      },
-      {
-        id: 5,
-        producto: 302,
-        producto_nombre: "Apple Pencil",
-        producto_precio: "129.99",
-        cantidad: 1,
-        precio_unitario: "129.99",
-        subtotal: "129.99"
-      },
-      {
-        id: 6,
-        producto: 303,
-        producto_nombre: "Magic Keyboard",
-        producto_precio: "299.99",
-        cantidad: 1,
-        precio_unitario: "299.99",
-        subtotal: "299.99"
-      }
-    ],
-    fecha_pedido: "2024-03-26T09:15:00.000Z",
-    estado: "entregado",
-    estado_display: "Entregado",
-    metodo_pago: "transferencia",
-    metodo_pago_display: "Transferencia Bancaria",
-    nota_comprador: "Dejar con el portero si no estoy",
-    nota_vendedor: "",
-    total: "1029.97",
-    updated_at: "2024-03-26T14:20:00.000Z"
-  },
-  {
-    id: "1004",
-    nombre_cliente: "Ana Martínez",
-    email_cliente: "ana.martinez@example.com",
-    telefono_cliente: "+34 645 678 901",
-    direccion_entrega: "Calle Nueva 234",
-    negocio: 3,
-    negocio_nombre: "Tienda Sur",
-    items: [
-      {
-        id: 7,
-        producto: 401,
-        producto_nombre: "Apple Watch Series 8",
-        producto_precio: "399.99",
-        cantidad: 1,
-        precio_unitario: "399.99",
-        subtotal: "399.99"
-      }
-    ],
-    fecha_pedido: "2024-03-25T11:20:00.000Z",
-    estado: "cancelado",
-    estado_display: "Cancelado",
-    metodo_pago: "tarjeta",
-    metodo_pago_display: "Tarjeta de Débito",
-    nota_comprador: "",
-    nota_vendedor: "Cliente solicitó cancelación",
-    total: "399.99",
-    updated_at: "2024-03-25T12:30:00.000Z"
+// Cargar pedidos
+const fetchOrders = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    const response = await adminServices.getOrders();
+    orders.value = response.data || [];
+    console.log(orders.value);
+  } catch (err) {
+    console.error('Error al cargar pedidos:', err);
+    error.value = 'Error al cargar los pedidos';
+    orders.value = []; // Asegurar que orders sea un array vacío en caso de error
+  } finally {
+    loading.value = false;
   }
-]);
+};
+
+// Actualizar estado del pedido
+const updateOrderStatus = async (order, newStatus) => {
+  try {
+    await adminServices.updateOrderStatus(order.id, newStatus);
+    // Actualizar el pedido en la lista local
+    const index = orders.value.findIndex(o => o.id === order.id);
+    if (index !== -1) {
+      orders.value[index].estado = newStatus;
+      if (selectedOrder.value?.id === order.id) {
+        selectedOrder.value.estado = newStatus;
+      }
+    }
+  } catch (err) {
+    console.error('Error al actualizar estado:', err);
+    // Aquí podrías mostrar un mensaje de error al usuario
+  }
+};
 
 const getStatusClass = (status) => {
   const classes = {
@@ -527,11 +536,11 @@ const getStatusClass = (status) => {
 
 const getStatusText = (status) => {
   const statusMap = {
-    pending: "Pendiente",
-    processing: "En Proceso",
-    shipped: "Enviado",
-    delivered: "Entregado",
-    cancelled: "Cancelado",
+    pendiente: "Pendiente",
+    en_proceso: "En Proceso",
+    enviado: "Enviado",
+    entregado: "Entregado",
+    cancelado: "Cancelado",
   };
   return statusMap[status] || status;
 };
@@ -548,13 +557,10 @@ const showOrderDetails = (order) => {
   selectedOrder.value = order;
 };
 
-const updateOrderStatus = (order) => {
-  // Aquí iría la lógica para actualizar el estado del pedido
-  console.log("Actualizando estado del pedido:", order.id);
-};
-
 const printOrder = (orderId) => {
   // Aquí iría la lógica para imprimir el pedido
   console.log("Imprimiendo pedido:", orderId);
 };
+
+onMounted(fetchOrders);
 </script>
