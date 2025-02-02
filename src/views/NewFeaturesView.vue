@@ -5,7 +5,7 @@
         Novedades en E-comCuba
       </h1>
       <p class="text-gray-600 text-lg">
-        Última actualización: 26 de enero de 2024
+        Última actualización: 2 de febrero 2025
       </p>
     </div>
 
@@ -25,11 +25,44 @@
             />
             <div>
               <h3 class="font-semibold text-gray-900 text-lg mb-2">
-                Panel Administrativo Mejorado
+                Gestión de Pedidos Mejorada
               </h3>
               <p class="text-gray-600">
-                Hemos optimizado la interfaz y corregido errores para una mejor
-                experiencia de gestión.
+                Nuevo sistema de estados para pedidos: Pendiente, En Proceso, Entregado y Cancelado. Mejor organización y seguimiento de tus ventas.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+        >
+          <div class="flex items-start">
+            <FunnelIcon
+              class="w-6 h-6 text-green-500 mt-1 mr-4 flex-shrink-0"
+            />
+            <div>
+              <h3 class="font-semibold text-gray-900 text-lg mb-2">
+                Filtros Avanzados de Pedidos
+              </h3>
+              <p class="text-gray-600">
+                Nuevos filtros por estado, fecha y búsqueda para encontrar rápidamente los pedidos que necesitas.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="p-6 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+        >
+          <div class="flex items-start">
+            <ChartBarIcon
+              class="w-6 h-6 text-green-500 mt-1 mr-4 flex-shrink-0"
+            />
+            <div>
+              <h3 class="font-semibold text-gray-900 text-lg mb-2">
+                Estadísticas en Tiempo Real
+              </h3>
+              <p class="text-gray-600">
+                Panel con estadísticas de pedidos diarios, pendientes, en proceso y completados para mejor seguimiento de tu negocio.
               </p>
             </div>
           </div>
@@ -201,5 +234,7 @@ import {
   MagnifyingGlassIcon,
   UsersIcon,
   BuildingStorefrontIcon,
+  FunnelIcon,
+  ChartBarIcon,
 } from "@heroicons/vue/24/outline";
 </script>
