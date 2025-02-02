@@ -70,38 +70,43 @@ const copyToClipboard = async () => {
       <h3 class="text-lg sm:text-xl font-bold mb-4">Proceso de compra</h3>
 
       <div class="space-y-4">
-        <!-- Copiar orden -->
-        <div class="border rounded-lg p-3">
+        <!-- Pedido Online (Opción 1) - Solo si hace domicilios -->
+        <div v-if="infoNegocio?.hace_domicilio" class="border rounded-lg p-3">
           <div class="flex items-center gap-2 mb-2">
             <span
               class="bg-jati text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold"
               >1</span
             >
-            <h4 class="font-medium">Copia tu orden</h4>
+            <h4 class="font-medium">Hacer pedido online</h4>
           </div>
-          <button
-            @click="copyToClipboard"
-            class="w-full flex items-center gap-2 p-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
-          >
-            <component
-              :is="copied ? ClipboardDocumentCheckIcon : ClipboardDocumentIcon"
-              class="h-5 w-5"
-            />
-            <span>{{ copied ? "¡Copiado!" : "Copiar orden" }}</span>
-          </button>
+          <!-- Slot para el botón de pedido online -->
+          <slot name="additional-actions"></slot>
         </div>
 
-        <!-- Contacto -->
+        <!-- Contacto directo (Opción 2 o 1 si no hay domicilios) -->
         <div class="border rounded-lg p-3">
           <div class="flex items-center gap-2 mb-2">
             <span
               class="bg-jati text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold"
-              >2</span
+              >{{ infoNegocio?.hace_domicilio ? '2' : '1' }}</span
             >
-            <h4 class="font-medium">Contacta con la tienda</h4>
+            <h4 class="font-medium">Contacto directo</h4>
           </div>
 
           <div class="space-y-2">
+            <!-- Botón copiar orden -->
+            <button
+              @click="copyToClipboard"
+              class="w-full flex items-center gap-2 p-3 bg-gray-800 text-white rounded-lg hover:bg-gray-700"
+            >
+              <component
+                :is="copied ? ClipboardDocumentCheckIcon : ClipboardDocumentIcon"
+                class="h-5 w-5"
+              />
+              <span>{{ copied ? "¡Copiado!" : "Copiar orden" }}</span>
+            </button>
+
+            <!-- WhatsApp -->
             <a
               v-if="infoNegocio?.whatsapp"
               :href="`${infoNegocio.whatsapp}?text=${generateWhatsAppMessage()}`"
@@ -113,6 +118,7 @@ const copyToClipboard = async () => {
               <span>WhatsApp</span>
             </a>
 
+            <!-- Teléfono -->
             <a
               v-if="infoNegocio?.telefono"
               :href="`tel:${formatPhoneNumber(infoNegocio.telefono)}`"
@@ -122,6 +128,7 @@ const copyToClipboard = async () => {
               <span>Llamar</span>
             </a>
 
+            <!-- Dirección -->
             <div
               v-if="infoNegocio?.direccion"
               class="flex items-center gap-2 p-3 bg-gray-100 rounded-lg"

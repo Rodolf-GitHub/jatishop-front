@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useCartStore } from "@/stores/cartStore";
 import { services } from "@/services/api";
 import { getImageUrl } from "@/utils/image";
+import { useToast } from "vue-toastification";
 import {
   ShoppingCartIcon,
   XMarkIcon,
@@ -13,9 +14,11 @@ import CheckoutModal from "./CheckoutModal.vue";
 import IconWhatsApp from "@/components/icons/IconWhatsApp.vue";
 import CreateOrderModal from "./CreateOrderModal.vue";
 
+const toast = useToast();
 const cartStore = useCartStore();
 const showCart = ref(false);
 const showCheckoutModal = ref(false);
+const showCreateOrderModal = ref(false);
 const infoNegocio = ref(null);
 const router = useRouter();
 const route = useRoute();
@@ -30,10 +33,11 @@ const openCheckoutModal = async () => {
       const response = await services.getStore(route.params.slug);
       infoNegocio.value = response.data;
       showCheckoutModal.value = true;
+      showCart.value = false; // Cerrar el carrito
     }
   } catch (error) {
     console.error("Error al obtener información del negocio:", error);
-    errorMessage.value = "Error al procesar el pedido";
+    toast.error("Error al procesar el pedido");
   }
 };
 
@@ -66,10 +70,15 @@ const generateWhatsAppLink = () => {
   return `${infoNegocio.value.whatsapp}`;
 };
 
+const handleCreateOrder = () => {
+  showCheckoutModal.value = false;
+  showCreateOrderModal.value = true;
+};
+
 const handleOrderSuccess = (orderData) => {
-  // Aquí puedes manejar el éxito de la creación del pedido
-  // Por ejemplo, mostrar un mensaje de éxito, redirigir, etc.
-  showCart.value = false;
+  showCreateOrderModal.value = false;
+  cartStore.clearCart();
+  toast.success("¡Pedido creado con éxito!");
 };
 
 onMounted(async () => {
@@ -243,20 +252,33 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Modal de checkout -->
-    <!-- <CheckoutModal
+    <!-- Modal de checkout con opciones -->
+    <CheckoutModal
+      v-if="showCheckoutModal"
       :show-modal="showCheckoutModal"
       :info-negocio="infoNegocio"
       :cart-items="cartStore.items"
       :total-amount="totalAmount"
       @close="showCheckoutModal = false"
-    /> -->
+    >
+      <!-- Slot para el botón de pedido online solo si hace domicilios -->
+      <template v-if="infoNegocio?.hace_domicilio" #additional-actions>
+        <button
+          @click="handleCreateOrder"
+          class="w-full flex items-center gap-2 p-3 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600"
+        >
+          <ShoppingCartIcon class="h-5 w-5" />
+          <span>Hacer Pedido Online</span>
+        </button>
+      </template>
+    </CheckoutModal>
 
+    <!-- Modal de crear pedido -->
     <CreateOrderModal
-      v-if="showCheckoutModal"
-      :show-modal="showCheckoutModal"
+      v-if="showCreateOrderModal"
+      :show-modal="showCreateOrderModal"
       :info-negocio="infoNegocio"
-      @close="showCheckoutModal = false"
+      @close="showCreateOrderModal = false"
       @success="handleOrderSuccess"
     />
   </div>

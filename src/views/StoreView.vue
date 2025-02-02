@@ -2,11 +2,12 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { services } from "@/services/api";
+import { useToast } from "vue-toastification";
 import InfiniteProductList from "@/components/products/InfiniteProductList.vue";
 import { useCartStore } from "@/stores/cartStore";
 
+const toast = useToast();
 const cartStore = useCartStore();
-
 const route = useRoute();
 const loading = ref(true);
 const error = ref(null);
@@ -18,7 +19,7 @@ const handleLoadError = (err) => {
     loading.value = false;
     return;
   }
-  error.value = "Error al cargar los productos";
+  toast.error("Error al cargar los productos");
   console.error("Error en StoreView:", err);
 };
 
@@ -42,7 +43,7 @@ const fetchStoreInfo = async () => {
       .querySelector('meta[property="og:description"]')
       .setAttribute(
         "content",
-        infoNegocio.value.descripcion || "Tienda en E-comCuba",
+        infoNegocio.value.descripcion || "Tienda en E-comCuba"
       );
     document
       .querySelector('meta[property="og:image"]')
@@ -58,8 +59,8 @@ const fetchStoreInfo = async () => {
       slug: route.params.slug,
     });
   } catch (err) {
-    error.value = "Error al cargar la información de la tienda";
-    console.error(err);
+    toast.error("Error al cargar la información de la tienda");
+    console.error("Error al cargar la tienda:", err);
   }
 };
 
@@ -86,11 +87,6 @@ onMounted(() => {
     </div>
 
     <div class="container mx-auto px-4">
-      <!-- Mensaje de error solo si no es la carga inicial -->
-      <div v-if="error && !loading" class="text-red-500 text-center py-4">
-        {{ error }}
-      </div>
-
       <!-- Catálogo completo -->
       <div class="mt-12 mb-16">
         <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">

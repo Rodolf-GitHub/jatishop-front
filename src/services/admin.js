@@ -293,7 +293,7 @@ export const adminServices = {
 
   // Pedidos
   getOrders() {
-    return adminApi.get("/mi-negocio/pedidos/");
+    return adminApi.get("/mi-negocio/pedidos-admin/");
   },
 
   createOrder(orderData) {
@@ -314,7 +314,7 @@ export const adminServices = {
       );
     }
 
-    return adminApi.post("/mi-negocio/pedidos/", {
+    return adminApi.post("/mi-negocio/pedidos-admin/", {
       nombre_cliente,
       email_cliente,
       telefono_cliente,
@@ -327,7 +327,7 @@ export const adminServices = {
 
   // Obtener un pedido por ID
   getOrderById(id) {
-    return adminApi.get(`/mi-negocio/pedidos/${id}/`);
+    return adminApi.get(`/mi-negocio/pedidos-admin/${id}/`);
   },
 
   // Actualizar un pedido existente
@@ -358,13 +358,13 @@ export const adminServices = {
     return adminApi.patch(`/mi-negocio/pedidos/${id}/`, updateData);
   },
 
-  // Nuevos servicios
-  deleteOrder(id) {
-    return adminApi.delete(`/mi-negocio/pedidos/${id}/`);
-  },
+  // // Nuevos servicios
+  // deleteOrder(id) {
+  //   return adminApi.delete(`/mi-negocio/pedidos/${id}/`);
+  // },
 
   updateOrderStatus(id, status) {
-    return adminApi.post(`/mi-negocio/pedidos/${id}/actualizar_estado/`, {
+    return adminApi.patch(`/mi-negocio/pedidos-admin/${id}/actualizar_estado/`, {
       estado: status,
     });
   },
